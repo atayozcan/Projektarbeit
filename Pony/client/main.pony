@@ -3,7 +3,7 @@ use "collections"
 
 actor Main
   new create(env: Env) =>
-    let count: USize = 10
+    let count: USize = 3
     env.out.print("Spawning " + count.string() + " concurrent clients...")
     let auth = TCPConnectAuth(env.root)
     for i in Range(0, count) do Worker(auth, env) end

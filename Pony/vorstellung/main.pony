@@ -29,6 +29,8 @@ actor Main
     let s1 = Square.create_empty()
     let shapes = [t1; s1]
     for (i, shape) in shapes.pairs() do
-      env.out.print("Shape "+ i.string() + " has " + shape.get_sides().string() + " sides.")
-      env.out.print("And it's coordinates are: " + shape.get_coord().string())
+      env.out.print("Shape "+ i.string() +
+      " has " + shape.get_sides().string() +
+      " sides, "+"and it's coordinates are: " +
+      shape.get_coord().string())
     end
