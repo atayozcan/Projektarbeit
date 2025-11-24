@@ -3,7 +3,7 @@ project(Projektarbeit)
 
 set(CMAKE_CXX_STANDARD 26)
 
-include_directories(.)
+include_directories(..)
 
 add_executable(Projektarbeit
         main.cpp
