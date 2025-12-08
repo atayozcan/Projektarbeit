@@ -1,0 +1,29 @@
+# Build artifacts
+target/
+build/
+cmake-build-*/
+
+# Rust
+Cargo.lock
+
+# Pony binaries
+Pony/**/deadlocks
+Pony/**/server
+Pony/**/client
+Pony/**/vorstellung
+
+# Swift binaries
+Swift/**/deadlocks
+
+# C++ binaries
+C++/**/Projektarbeit
+
+# IDE
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/shelf/
+*.iws
+
+# OS
+.DS_Store
+Thumbs.db

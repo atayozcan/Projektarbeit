@@ -1,1 +1,0 @@
-/usr/bin/c++ -Wl,--dependency-file=CMakeFiles/Projektarbeit.dir/link.d CMakeFiles/Projektarbeit.dir/main.cpp.o -o Projektarbeit

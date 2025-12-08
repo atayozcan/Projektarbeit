@@ -1,3 +1,0 @@
-/home/atay/Documents/School/Projektarbeit/C++/deadlocks/build/CMakeFiles/Projektarbeit.dir
-/home/atay/Documents/School/Projektarbeit/C++/deadlocks/build/CMakeFiles/edit_cache.dir
-/home/atay/Documents/School/Projektarbeit/C++/deadlocks/build/CMakeFiles/rebuild_cache.dir
