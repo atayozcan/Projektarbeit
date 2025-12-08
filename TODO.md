@@ -1,0 +1,13 @@
+# TODO
+- code aufräumen
+- dokumentieren
+- go Ausgaben
+- Microsoft data race prediction
+- data races implementieren
+- memory leaks
+- out of bounds...
+- dining philosophers
+- Fehlertypen
+- Sicherheitslücken
+- Schwachstellen
+- Fehlervermeidung
