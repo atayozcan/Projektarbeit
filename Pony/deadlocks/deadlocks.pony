@@ -1,15 +1,20 @@
-actor Thread1
-  be message(env: Env) =>
-    env.out.print("Thread 1")
+actor Sender
+  let _receiver: Receiver
 
-actor Thread2
-  be message(env: Env) =>
-    env.out.print("Thread 2")
+  new create(receiver: Receiver) => _receiver = receiver
+
+  be send_message(msg: String) => _receiver.receive(msg)
+
+actor Receiver
+  let _env: Env
+
+  new create(env: Env) => _env = env
+
+  be receive(msg: String) => _env.out.print("Receiver got: " + msg)
 
 actor Main
   new create(env: Env) =>
-    let t1 = Thread1
-    let t2 = Thread2
+    let receiver = Receiver(env)
+    let sender = Sender(receiver)
 
-    t1.message(env)
-    t2.message(env)
+    sender.send_message("Hello from Sender!")
