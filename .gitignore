@@ -18,7 +18,9 @@ Swift/**/deadlocks
 # C++ binaries
 C++/**/Projektarbeit
 
-# IDE
+# IDE - keep root .idea but ignore nested ones and user-specific files
+**/.idea/
+!/.idea/
 .idea/workspace.xml
 .idea/tasks.xml
 .idea/shelf/
