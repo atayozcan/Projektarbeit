@@ -1,6 +1,6 @@
 Das C++ Beispiel für einen Deadlock besteht aus zwei Threads, mit jeweils zwei locks.
 Jeder Thread hat eine eigene Funktion, in der er versucht sich beide Ressourcen zu holen.
-Zunächst startet Thread eins und holt sich erfolgreich Ressource eins. Als Simulation 
+Zunächst startet Thread eins und holt sich erfolgreich Ressource eins. Als Simulation
 eines Arbeitsschrittes wird er für ein paar Sekunden schlafen gelegt.
 
 ```

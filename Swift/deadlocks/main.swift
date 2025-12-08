@@ -1,42 +1,84 @@
-actor UserManager {
-    let preferencesManager: PreferencesManager
+import Foundation
 
-    init(preferencesManager: PreferencesManager) {
-        self.preferencesManager = preferencesManager
+// Two actors that will be used to create a deadlock
+actor Resource1 {
+    private var holder: String? = nil
+
+    func acquire(by thread: String) async {
+        holder = thread
+        print("\(thread): Locked resource1")
     }
 
-    func updateProfile() async {
-        // This will call PreferencesManager, which in turn calls UserManager's method, creating a deadlock
-        print("UserManager: Calling getPreferences...")
-        let preferences = await preferencesManager.getPreferences()  // Line A
-        print("UserManager: Profile updated with preferences: \(preferences)")
-    }
-
-    func getUserInfo() async -> String {
-        // Simulate fetching user info
-        return "User Info"
+    func release() {
+        holder = nil
     }
 }
 
-actor PreferencesManager {
-    func getPreferences() async -> String {
-        // This calls back to UserManager's method, causing a deadlock
-        print("PreferencesManager: Calling getUserInfo...")
-        let userInfo = await userManager.getUserInfo()  // Line B
-        return "Preferences based on \(userInfo)"
+actor Resource2 {
+    private var holder: String? = nil
+
+    func acquire(by thread: String) async {
+        holder = thread
+        print("\(thread): Locked resource2")
     }
 
-    func getUserInfo() async -> String {
-        // This function is waiting on getPreferences() which already called getUserInfo()
-        return "User Info"
+    func release() {
+        holder = nil
     }
 }
 
-// Instantiate actors
-let preferencesManager = PreferencesManager()
-let userManager = UserManager(preferencesManager: preferencesManager)
+// Shared resources
+let resource1 = Resource1()
+let resource2 = Resource2()
 
-// This will attempt to run in a Task but will deadlock
+func thread1Function() async {
+    print("Thread 1: Starting...")
+
+    // Thread 1 locks resource1 first
+    await resource1.acquire(by: "Thread 1")
+
+    // Small delay to ensure both threads have acquired their first lock
+    try? await Task.sleep(nanoseconds: 100_000_000)
+
+    print("Thread 1: Trying to lock resource2...")
+    // Thread 1 then tries to lock resource2 (but thread2 has it)
+    await resource2.acquire(by: "Thread 1")
+
+    // This code will never be reached due to deadlock
+    print("Thread 1: Completed successfully!")
+}
+
+func thread2Function() async {
+    print("Thread 2: Starting...")
+
+    // Thread 2 locks resource2 first (opposite order from thread1)
+    await resource2.acquire(by: "Thread 2")
+
+    // Small delay to ensure both threads have acquired their first lock
+    try? await Task.sleep(nanoseconds: 100_000_000)
+
+    print("Thread 2: Trying to lock resource1...")
+    // Thread 2 then tries to lock resource1 (but thread1 has it)
+    await resource1.acquire(by: "Thread 2")
+
+    // This code will never be reached due to deadlock
+    print("Thread 2: Completed successfully!")
+}
+
+print("")
+print("=== Deadlock Example (Swift Actors) ===")
+print("This program demonstrates a deadlock using Swift actors.")
+print("You'll need to forcefully terminate it (Ctrl+C).")
+print("")
+
+// Create two concurrent tasks
 Task {
-    await userManager.updateProfile()  // This will lead to a deadlock
+    await thread1Function()
 }
+
+Task {
+    await thread2Function()
+}
+
+// Keep the program running
+RunLoop.main.run()

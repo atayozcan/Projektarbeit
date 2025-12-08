@@ -1,0 +1,13 @@
+Das Go Beispiel für einen Deadlock besteht aus zwei Goroutines, mit jeweils zwei Mutexes.
+Jede Goroutine hat eine eigene Funktion, in der sie versucht sich beide Ressourcen zu holen.
+Zunächst startet Goroutine eins und holt sich erfolgreich Mutex eins. Als Simulation
+eines Arbeitsschrittes wird sie für ein paar Millisekunden schlafen gelegt.
+
+```
+Thread 1: Starting...
+Thread 1: Locked mutex1
+Thread 2: Starting...
+Thread 2: Locked mutex2
+Thread 1: Trying to lock mutex2...
+Thread 2: Trying to lock mutex1...
+```
