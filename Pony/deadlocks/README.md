@@ -1,7 +1,8 @@
 Das Pony Beispiel zeigt dasselbe Muster, das in anderen Sprachen zu einem Deadlock führt.
 Zwei Actors versuchen Ressourcen in umgekehrter Reihenfolge zu erwerben.
-In Pony verhindert das Actor-Modell jedoch traditionelle Deadlocks durch Design:
-Nachrichten werden asynchron verarbeitet und Actors blockieren nie.
+In Pony verhindert das Aktormodell jedoch traditionelle Deadlocks durch sein Design:
+Nachrichten werden asynchron verarbeitet und Actors blockieren nie, da sie nicht auf die Antwort des
+gegenüber warten müssen und weiterarbeiten können.
 
 ```
 Thread 1: Starting...
@@ -18,4 +19,6 @@ Thread 2: Locked resource1
 Thread 2: Completed successfully!
 ```
 
-Im Gegensatz zu den anderen Sprachen terminiert dieses Programm erfolgreich.
+Im Gegensatz zu den anderen Sprachen terminiert dieses Programm erfolgreich,
+da das Aktormodell keinen gemeinsamen Speicher erlaubt und so locks überflüssig sind.
+Jeder Aktor steht dabei für einen Thread und innerhalb dieser laufen Anweisungen sequenziell ab.

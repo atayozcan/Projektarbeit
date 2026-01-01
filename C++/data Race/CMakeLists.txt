@@ -7,5 +7,4 @@ include_directories(..)
 
 add_executable(Projektarbeit
         main.cpp
-        main.h
-        "../data Race/main.cpp")
+        main.h)
