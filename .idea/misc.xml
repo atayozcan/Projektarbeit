@@ -3,7 +3,7 @@
   <component name="CMakePythonSetting">
     <option name="pythonIntegrationState" value="YES" />
   </component>
-  <component name="CMakeWorkspace" PROJECT_DIR="$PROJECT_DIR$/C++/deadlocks">
+  <component name="CMakeWorkspace" PROJECT_DIR="$PROJECT_DIR$/C++/data Race">
     <contentRoot DIR="$PROJECT_DIR$" />
   </component>
 </project>

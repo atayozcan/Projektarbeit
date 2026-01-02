@@ -1,5 +1,4 @@
 # TODO
-
 - data races implementieren
 - memory leaks
 - out of bounds...
@@ -10,15 +9,13 @@
 - Fehlervermeidung
 
 ## Was ist Pony?
-
-- Was ist Actormodell
+- Was ist das Aktormodell
 - Features vorstellen - Beispielprojekte
 - Vergleich mit anderen Sprachen
 - Wie geht Pony mit klassischen Problemen vor
 - Fazit
 
 ## Untersuchungsthemen
-
 - CSP
 - Deadlock
 - Data races
