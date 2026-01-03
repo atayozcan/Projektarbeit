@@ -1,4 +1,5 @@
 use "promises"
+use "collections"
 
 actor Thread1
   let _env: Env
@@ -8,7 +9,11 @@ actor Thread1
     _env.out.print("Thread 1: Starting...")
 
   be increment(x: U32, p: Promise[U32]) =>
-    p(x + 1)
+    var counter = x
+    for _ in Range[U32](0, 100_000) do
+      counter = counter + 1
+    end
+    p(counter)
 
 
 actor Thread2
@@ -19,7 +24,11 @@ actor Thread2
     _env.out.print("Thread 2: Starting...")
 
   be increment(x: U32, p: Promise[U32]) =>
-    p(x + 1)
+    var counter = x
+    for _ in Range[U32](0, 100_000) do
+      counter = counter + 1
+    end
+    p(counter)
 
 
 actor Main
@@ -44,4 +53,4 @@ actor Main
       None
     })
 
-    thread1.increment(4, p)
+    thread1.increment(0, p)
