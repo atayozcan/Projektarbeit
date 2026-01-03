@@ -1,4 +1,3 @@
-
 import (
 	"fmt"
 	"time"
@@ -37,4 +36,3 @@ func main() {
 	// 3.
 	mem := C.malloc(1000)
 }
-
