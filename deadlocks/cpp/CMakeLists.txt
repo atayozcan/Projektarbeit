@@ -5,6 +5,4 @@ set(CMAKE_CXX_STANDARD 23)
 
 include_directories(..)
 
-add_executable(Projektarbeit
-        main.cpp
-        main.h)
+add_executable(Projektarbeit main.cpp)
