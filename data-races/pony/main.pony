@@ -29,8 +29,6 @@ actor Main
     let thread1 = Thread1(env)
     let thread2 = Thread2(env)
 
-    let counter: U32 = 4
-
     let p = Promise[U32]
 
     p.next[None]({(value: U32): None =>
@@ -46,4 +44,4 @@ actor Main
       None
     })
 
-    thread1.increment(counter, p)
+    thread1.increment(4, p)
