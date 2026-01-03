@@ -1,0 +1,6 @@
+#ifndef PROJEKTARBEIT_MAIN_H
+#define PROJEKTARBEIT_MAIN_H
+
+class main {};
+
+#endif
