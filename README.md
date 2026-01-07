@@ -49,3 +49,14 @@ Pony hat einen Compiler, der den code zunächst in Zwischencode umwandelt und op
 ### C kompatibel
 
 Pony Programme können in C-Code übersetzt werden.
+
+## Nachteile
+
+### Mangelnde API-Stabilität
+Pony hat die Version 1.0 noch nicht erreicht.
+
+### Mangel an hochwertigen Bibliotheken von Drittanbietern
+Aktuell gibt es nur die eigene Bibliothek.
+
+### Begrenzte native Werkzeuge
+Keine IDE unterstützt die Pony Language. Auch Analyse Tools sind derzeit nicht verfügbar.

@@ -22,7 +22,7 @@ interface Shape
 
 Klassen in Pony können mehrere Konstruktoren haben und Interfaces implementieren:
 
-```pony
+```
 class Triangle is Shape
   let _sides: U8 = 3
   var _coord: Coord
@@ -34,7 +34,7 @@ class Triangle is Shape
 
 Der Einstiegspunkt eines Pony-Programms ist immer ein Actor namens `Main`:
 
-```pony
+```
 actor Main
   new create(env: Env) =>
     // Programmlogik

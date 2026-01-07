@@ -1,6 +1,5 @@
 # TODO
 
-- `runtime errors like out of bonds...`
 - dining philosophers
 - Fehlertypen
 - Sicherheitslücken
