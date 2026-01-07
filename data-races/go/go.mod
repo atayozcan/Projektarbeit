@@ -1,3 +1,3 @@
 module data-races
 
-        go 1.25
+go 1.25.5

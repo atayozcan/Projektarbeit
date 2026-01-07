@@ -1,25 +1,47 @@
+// Data Race Demonstration in C++26
 #include <iostream>
 #include <thread>
-
-using namespace std;
+#include <print>
 
 int counter = 0;
+constexpr int ITERATIONS = 100000;
 
 void increment() {
-  for (int i = 0; i < 100000; ++i) {
-    ++counter;
-  }
+    for (int i = 0; i < ITERATIONS; ++i) {
+        ++counter;  // UNSICHER: Keine Synchronisation
+    }
 }
 
 int main() {
-  // Create two threads that run the increment function concurrently
-  thread t1(increment);
-  thread t2(increment);
+    std::println("=== Data Race Test: C++26 ===");
+    std::println("");
+    std::println("Setup: Two threads incrementing a shared counter");
+    std::println("Each thread: {} increments", ITERATIONS);
+    std::println("Expected result: {}", ITERATIONS * 2);
+    std::println("");
 
-  // Wait for both threads to finish
-  t1.join();
-  t2.join();
+    std::println("--- Running Test ---");
+    std::println("Thread 1: Starting...");
+    std::println("Thread 2: Starting...");
 
-  cout << "Counter value: " << counter << endl;
-  return 0;
+    std::thread t1(increment);
+    std::thread t2(increment);
+
+    t1.join();
+    t2.join();
+
+    std::println("Thread 1: Finished");
+    std::println("Thread 2: Finished");
+    std::println("");
+
+    std::println("--- Result ---");
+    std::println("Counter: {}", counter);
+
+    if (counter == ITERATIONS * 2) {
+        std::println("Status: NO RACE DETECTED (got lucky!)");
+    } else {
+        std::println("Status: RACE DETECTED (lost {} increments)", (ITERATIONS * 2) - counter);
+    }
+
+    return 0;
 }

@@ -1,41 +1,113 @@
 # Deadlocks
 
-## Was sind Deadlocks?
+Vergleich wie verschiedene Programmiersprachen mit Deadlocks umgehen.
 
-Ein Deadlock entsteht, wenn zwei oder mehr Threads gegenseitig auf Ressourcen warten, die der jeweils andere hält. Keiner der Threads kann fortfahren, da jeder auf die Freigabe durch den anderen wartet. Das Programm bleibt in diesem Zustand hängen.
+## Das Problem
 
-## Das Problem in traditionellen Sprachen
+Ein Deadlock entsteht bei zirkulären Warteabhängigkeiten:
 
-In C++, Go, Rust, Swift und anderen Sprachen, die Locks zur Synchronisation verwenden, sind Deadlocks ein häufiges Problem. Das klassische Szenario:
+```
+Thread 1: Hält Lock A → Wartet auf Lock B → [BLOCKED]
+Thread 2: Hält Lock B → Wartet auf Lock A → [BLOCKED]
+```
 
-1. Thread A hält Lock 1 und wartet auf Lock 2
-2. Thread B hält Lock 2 und wartet auf Lock 1
-3. Beide Threads warten ewig aufeinander
+Keiner kann fortfahren. Das Programm hängt.
 
-### Typische Lösungsansätze
+## Sprachen im Vergleich
 
-- **Lock-Reihenfolge**: Alle Threads müssen Locks in derselben Reihenfolge anfordern
-- **Timeout**: Locks werden nach einer bestimmten Zeit freigegeben
-- **Deadlock-Erkennung**: Das System erkennt und löst Deadlocks auf
-- **Try-Lock**: Nicht-blockierendes Anfordern von Locks
+| Sprache | Version | Deadlock möglich? | Ergebnis |
+|---------|---------|-------------------|----------|
+| C++ | 26 | Ja | Hängt ewig |
+| Go | 1.25.5 | Ja | Hängt ewig |
+| Rust | 2024 | Ja | Hängt ewig |
+| Swift | 6.2 | Ja | Hängt ewig |
+| **Pony** | - | **Nein** | **Terminiert** |
 
-Diese Lösungen sind komplex, fehleranfällig und erfordern disziplinierte Programmierung.
+## Wichtige Unterscheidung
 
-## Ponys Lösung: Das Aktormodell
+| Sprache | Data Races | Deadlocks |
+|---------|------------|-----------|
+| C++ | Möglich | Möglich |
+| Go | Möglich | Möglich |
+| Rust | **Verhindert** | Möglich |
+| Swift | **Verhindert** | Möglich |
+| **Pony** | **Verhindert** | **Verhindert** |
 
-Pony verwendet das Aktormodell, das Deadlocks strukturell verhindert:
+Rust und Swift verhindern Data Races, aber **nicht** Deadlocks!
 
-- **Keine Shared Memory**: Actors teilen keinen veränderlichen Speicher
-- **Asynchrone Nachrichten**: Kommunikation erfolgt über nicht-blockierende Nachrichten
-- **Keine Locks**: Da kein gemeinsamer Speicher existiert, sind Locks überflüssig
-- **Sequenzielle Verarbeitung**: Innerhalb eines Actors werden Nachrichten sequenziell abgearbeitet
+## Standardisierte Test-Ausgabe
 
-Da Actors niemals blockieren und keine Ressourcen im traditionellen Sinne "halten", können keine zirkulären Warteabhängigkeiten entstehen.
+```
+=== Deadlock Example ===
+This program will intentionally deadlock.
+You'll need to forcefully terminate it (Ctrl+C).
+
+Thread 1: Starting...
+Thread 1: Locked mutex1
+Thread 2: Starting...
+Thread 2: Locked mutex2
+Thread 1: Trying to lock mutex2...
+Thread 2: Trying to lock mutex1...
+[Programm hängt]
+```
+
+**Pony-Ausgabe** (einzige die terminiert):
+```
+Thread 1: Completed successfully!
+Thread 2: Completed successfully!
+```
 
 ## Verzeichnisstruktur
 
-- `cpp/` - C++ Beispiel mit zwei Mutexen
-- `go/` - Go Beispiel mit Goroutinen und Mutex
-- `pony/` - Pony Beispiel mit dem Aktormodell
-- `rust/` - Rust Beispiel mit Mutex
-- `swift/` - Swift Beispiel mit DispatchQueue
+```
+deadlocks/
+├── README.md
+├── cpp/
+│   ├── README.md
+│   ├── CMakeLists.txt
+│   └── main.cpp
+├── go/
+│   ├── README.md
+│   ├── go.mod
+│   └── deadlocks.go
+├── pony/
+│   ├── README.md
+│   └── deadlocks.pony
+├── rust/
+│   ├── README.md
+│   ├── Cargo.toml
+│   └── src/main.rs
+└── swift/
+    ├── README.md
+    └── main.swift
+```
+
+## Ausführen
+
+```bash
+# C++26
+cd cpp && cmake -B build && cmake --build build && ./build/Deadlocks
+
+# Go 1.25.5
+cd go && go run deadlocks.go
+
+# Rust 2024
+cd rust && cargo run
+
+# Swift 6.2
+cd swift && swift main.swift
+
+# Pony (einziges das terminiert!)
+cd pony && ponyc && ./deadlocks
+```
+
+## Kernaussage
+
+| Kategorie | Sprachen | Beschreibung |
+|-----------|----------|--------------|
+| Blocking | C++, Go, Rust, Swift | Locks können blockieren |
+| **Non-Blocking** | **Pony** | **Asynchrone Nachrichten** |
+
+Pony's Actor-Model verhindert Deadlocks durch Design:
+- Keine Locks, keine Blocking-Operationen
+- Rein asynchrone Kommunikation

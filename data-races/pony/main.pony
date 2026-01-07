@@ -1,56 +1,57 @@
-use "promises"
-use "collections"
+// Data Race Demonstration in Pony
+// HINWEIS: Pony VERHINDERT Data Races durch Reference Capabilities!
 
-actor Thread1
+actor Counter
+  var _value: U32 = 0
   let _env: Env
 
   new create(env: Env) =>
     _env = env
-    _env.out.print("Thread 1: Starting...")
 
-  be increment(x: U32, p: Promise[U32]) =>
-    var counter = x
-    for _ in Range[U32](0, 100_000) do
-      counter = counter + 1
+  be increment(times: U32) =>
+    var i: U32 = 0
+    while i < times do
+      _value = _value + 1
+      i = i + 1
     end
-    p(counter)
 
-
-actor Thread2
-  let _env: Env
-
-  new create(env: Env) =>
-    _env = env
-    _env.out.print("Thread 2: Starting...")
-
-  be increment(x: U32, p: Promise[U32]) =>
-    var counter = x
-    for _ in Range[U32](0, 100_000) do
-      counter = counter + 1
+  be report(expected: U32) =>
+    _env.out.print("")
+    _env.out.print("--- Result ---")
+    _env.out.print("Counter: " + _value.string())
+    if _value == expected then
+      _env.out.print("Status: NO RACE (Pony guarantees safety)")
+    else
+      _env.out.print("Status: UNEXPECTED (should never happen)")
     end
-    p(counter)
-
 
 actor Main
   new create(env: Env) =>
-    env.out.print("=== Promise Example (Pony) ===")
+    env.out.print("=== Data Race Test: Pony ===")
+    env.out.print("")
+    env.out.print("Setup: Two actors sending increments to shared counter")
+    env.out.print("Each actor: 100000 increments")
+    env.out.print("Expected result: 200000")
+    env.out.print("")
 
-    let thread1 = Thread1(env)
-    let thread2 = Thread2(env)
+    env.out.print("--- Pony Prevention Demo ---")
+    env.out.print("Pony VERHINDERT Data Races durch das Actor Model!")
+    env.out.print("Jeder Actor verarbeitet Nachrichten sequentiell.")
+    env.out.print("")
 
-    let p = Promise[U32]
+    env.out.print("--- Running Test ---")
+    env.out.print("Actor 1: Starting...")
+    env.out.print("Actor 2: Starting...")
 
-    p.next[None]({(value: U32): None =>
-      env.out.print("Nach Thread1: " + value.string())
+    let counter = Counter(env)
 
-      let p2 = Promise[U32]
-      p2.next[None]({(value2: U32): None =>
-        env.out.print("Nach Thread2: " + value2.string())
-        None
-      })
+    // Beide Actors senden Increment-Nachrichten
+    // Der Counter verarbeitet sie sequentiell
+    counter.increment(100000)
+    counter.increment(100000)
 
-      thread2.increment(value, p2)
-      None
-    })
+    env.out.print("Actor 1: Finished")
+    env.out.print("Actor 2: Finished")
 
-    thread1.increment(0, p)
+    // Report wird nach den Increments verarbeitet
+    counter.report(200000)

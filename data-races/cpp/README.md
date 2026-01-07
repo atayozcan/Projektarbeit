@@ -1,28 +1,77 @@
-Das C++ Beispiel für einen Data Race besteht aus zwei Threads, die jeweils auf eine ungeschützte
-globale Variable zugreifen. Die Threads kommunizieren nicht miteinander, sondern erhöhen den
-Zähler rücksichtslos. Dabei können als Endergebnis unterschiedliche Werte entstehen, wie einige
-die unten aufgelistet sind.
+# C++26: Data Race Demonstration
 
+## Das Problem
+
+```cpp
+int counter = 0;
+
+void increment() {
+    for (int i = 0; i < 100000; ++i) {
+        ++counter;  // UNSICHER!
+    }
+}
+
+thread t1(increment);
+thread t2(increment);
 ```
-Counter value: 138928
-Counter value: 125950
-Counter value: 101901
+
+Zwei Threads inkrementieren denselben Zähler ohne Synchronisation.
+
+## Warum ist das ein Problem?
+
+`++counter` ist **nicht atomar**. Es besteht aus:
+1. Lesen des aktuellen Werts
+2. Inkrementieren
+3. Zurückschreiben
+
+Wenn beide Threads gleichzeitig lesen, geht ein Inkrement verloren.
+
+## Typische Ergebnisse
+
+| Durchlauf | Erwartet | Tatsächlich |
+|-----------|----------|-------------|
+| 1 | 200,000 | 138,928 |
+| 2 | 200,000 | 125,950 |
+| 3 | 200,000 | 101,901 |
+
+## Lösungen in C++
+
+### 1. `std::mutex`
+```cpp
+std::mutex mtx;
+void increment() {
+    for (...) {
+        std::lock_guard<std::mutex> lock(mtx);
+        ++counter;
+    }
+}
 ```
 
-Es gibt verschiedene Strategien, um dieses Verhalten in C++ Programmen zu vermeiden.
+### 2. `std::atomic`
+```cpp
+std::atomic<int> counter{0};
+void increment() {
+    for (...) {
+        ++counter;  // Atomar und sicher
+    }
+}
+```
 
-### Mutex
+### 3. Condition Variable
+```cpp
+std::condition_variable cv;
+// Blockiert Thread bis Bedingung erfüllt
+```
 
-Mit mutex sperrt man einen Bereich des Programms für n-1 Threads und jeder zugreifen möchte, muss warten, bis der
-mutex freigegeben wird. Dies kann zu deadlocks, starvation anderer Threads etc führen.
+## Vergleich mit Pony
 
-### Atomare Operationen
+| Aspekt | C++26 | Pony |
+|--------|-------|------|
+| Shared Memory | Standard | Verboten |
+| Synchronisation | Manuell (mutex/atomic) | Automatisch (Actors) |
+| Compiler-Schutz | Nein | Ja |
+| Data Race möglich | Ja | Nein |
 
-Atomare Operationen sorgen dafür, dass kein Thread die Operation unterbrechen kann, während sie ausgeführt wird und
-kein anderer Thread in den Prozess eingreifen kann um den Wert zwischen den Operationen ändern.
+## Fazit
 
-### Condition Variable
-
-Condition Variable werden verwendet, um einen Thread zu blockieren, bis eine bestimmte Bedingung erfüllt ist.
-Sie werden in Verbindung mit einem Mutex verwendet, um auf Änderungen an gemeinsam genutzten Daten zu warten oder diese
-zu signalisieren.
+C++ erlaubt unsynchronisierten Zugriff auf gemeinsamen Speicher. Der Programmierer muss aktiv Synchronisation hinzufügen.

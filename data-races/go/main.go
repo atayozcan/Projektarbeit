@@ -1,34 +1,52 @@
+// Data Race Demonstration in Go 1.25.5
 package main
 
 import (
 	"fmt"
 	"sync"
-	"time"
 )
 
-func example1() {
-    var x int
-    y := make(chan int, 1)
+const ITERATIONS = 100000
 
-    acquire := func() {
-        y <- 1
-    }
-    release := func() {
-        <-y
-    }
+var counter = 0
 
-    // Thread T2
-    go func() {
-        acquire()
-        x = 3 // P1
-        release()
-    }()
+func increment(wg *sync.WaitGroup) {
+	defer wg.Done()
+	for i := 0; i < ITERATIONS; i++ {
+		counter++ // UNSICHER: Keine Synchronisation
+	}
+}
 
-    // Thread T1 = Main Thread
-    x = 4 // P2
-    acquire()
-    release()
+func main() {
+	fmt.Println("=== Data Race Test: Go 1.25.5 ===")
+	fmt.Println()
+	fmt.Println("Setup: Two goroutines incrementing a shared counter")
+	fmt.Printf("Each goroutine: %d increments\n", ITERATIONS)
+	fmt.Printf("Expected result: %d\n", ITERATIONS*2)
+	fmt.Println()
 
-    time.Sleep(1 * 1e9)
-    fmt.Printf("%d \n", x)
+	fmt.Println("--- Running Test ---")
+	fmt.Println("Goroutine 1: Starting...")
+	fmt.Println("Goroutine 2: Starting...")
+
+	var wg sync.WaitGroup
+	wg.Add(2)
+
+	go increment(&wg)
+	go increment(&wg)
+
+	wg.Wait()
+
+	fmt.Println("Goroutine 1: Finished")
+	fmt.Println("Goroutine 2: Finished")
+	fmt.Println()
+
+	fmt.Println("--- Result ---")
+	fmt.Printf("Counter: %d\n", counter)
+
+	if counter == ITERATIONS*2 {
+		fmt.Println("Status: NO RACE DETECTED (got lucky!)")
+	} else {
+		fmt.Printf("Status: RACE DETECTED (lost %d increments)\n", (ITERATIONS*2)-counter)
+	}
 }

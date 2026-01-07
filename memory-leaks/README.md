@@ -1,36 +1,91 @@
 # Memory Leaks
 
-## Was sind Memory Leaks?
+Vergleich wie verschiedene Programmiersprachen mit Memory Leaks umgehen.
 
-Ein Memory Leak (Speicherleck) entsteht, wenn ein Programm Speicher auf dem Heap alloziert, diesen aber nie wieder freigibt. Der Speicher bleibt für die gesamte Laufzeit des Programms belegt und kann nicht wiederverwendet werden. Bei häufigen Allokationen kann dies zu erhöhtem Speicherverbrauch oder sogar zum Programmabsturz führen.
+## Das Problem
 
-## Das Problem in traditionellen Sprachen
+Ein Memory Leak entsteht wenn:
+- Speicher alloziert wird
+- Die Referenz verloren geht
+- Der Speicher nie freigegeben wird
 
-In C++ und anderen Sprachen mit manueller Speicherverwaltung muss der Programmierer selbst dafür sorgen, dass allozierter Speicher wieder freigegeben wird. Dies ist besonders fehleranfällig bei:
+```cpp
+void leak() {
+    auto ptr = new int[1000];
+    // Funktion endet, ptr ist weg
+    // Aber die 1000 ints bleiben im Speicher!
+}
+```
 
-- Komplexen Kontrollflüssen mit mehreren Rückgabepunkten
-- Exceptions, die vor der Freigabe auftreten
-- Vergessenen `delete`/`free` Aufrufen
-- Zirkulären Referenzen
+## Sprachen im Vergleich
 
-### Typische Lösungsansätze in C++
+| Sprache | Memory Management | Leak möglich? | Leak-Typen |
+|---------|-------------------|---------------|------------|
+| C++ | Manuell | Ja | Vergessenes delete |
+| Go | GC | Ja | Goroutine, Cache |
+| Rust | Ownership | Selten* | Referenzzyklen |
+| Swift | ARC | Selten* | Retain Cycles |
+| **Pony** | **ORCA GC** | **Nein** | - |
 
-- **Smart Pointers**: `unique_ptr`, `shared_ptr` geben Speicher automatisch frei
-- **RAII**: Resource Acquisition Is Initialization - Ressourcen werden im Destruktor freigegeben
-- **Garbage Collection**: In anderen Sprachen wie Java oder Go (nicht in C++)
+*Mit Smart Pointers / starken Referenzen möglich
 
-## Ponys Lösung: Garbage Collection mit ORCA
+## Warum kein Pony-Beispiel?
 
-Pony verwendet einen innovativen Garbage Collector namens ORCA (Ownership and Reference Counting for Actors):
+Pony verwendet ORCA (Ownership and Reference Counting for Actors):
+- **Kein Stop-the-World**: Jeder Actor hat eigenen GC
+- **Keine GC-Pausen**: Garbage Collection läuft nebenläufig
+- **Automatische Freigabe**: Programmierer kümmert sich nicht um Speicher
+- **Keine Goroutine-Leaks**: Actors ohne Nachrichten werden beendet
 
-- **Kein Stop-the-World**: Jeder Actor hat seinen eigenen Heap und GC
-- **Keine GC-Pausen**: Die Garbage Collection läuft nebenläufig
-- **Automatische Freigabe**: Der Programmierer muss sich nicht um Speicherfreigabe kümmern
-- **Reference Capabilities**: Ermöglichen effiziente Speicherübertragung zwischen Actors
+## Standardisierte Test-Ausgabe
 
-Da Pony eine speichersichere Sprache ist und Garbage Collection verwendet, sind klassische Memory Leaks praktisch ausgeschlossen.
+```
+=== Memory Leak Test: [Sprache] ===
+
+--- Test 1: Memory Leak ---
+Allocating memory without freeing...
+Status: LEAK
+
+--- Test 2: Safe Alternative ---
+Using safe memory management...
+Status: NO LEAK
+
+--- Comparison ---
+[Sprache]: [Beschreibung]
+Pony: Automatic GC, no manual freeing needed
+```
 
 ## Verzeichnisstruktur
 
-- `cpp/` - C++ Beispiel mit vergessener Speicherfreigabe
-- `go/` - Go Beispiel mit Goroutine-Leaks
+```
+memory-leaks/
+├── README.md
+├── cpp/
+│   ├── README.md
+│   ├── CMakeLists.txt
+│   └── main.cpp
+└── go/
+    ├── README.md
+    ├── go.mod
+    └── main.go
+```
+
+## Ausführen
+
+```bash
+# C++26
+cd cpp && cmake -B build && cmake --build build && ./build/MemoryLeaks
+
+# Go 1.25.5
+cd go && go run main.go
+```
+
+## Kernaussage
+
+| Kategorie | Sprachen | Beschreibung |
+|-----------|----------|--------------|
+| Manuelle Verwaltung | C++ | Programmierer gibt Speicher frei |
+| GC mit Leaks | Go | GC vorhanden, aber Leaks möglich |
+| **Sichere GC** | **Pony** | **ORCA verhindert alle Leak-Typen** |
+
+Pony's ORCA GC ist speziell für das Actor-Model optimiert und verhindert klassische Memory Leaks sowie Goroutine-Leaks strukturell.

@@ -1,7 +1,6 @@
 # TODO
-- data races implementieren
-- memory leaks
-- out of bounds...
+
+- `runtime errors like out of bonds...`
 - dining philosophers
 - Fehlertypen
 - Sicherheitslücken
@@ -9,6 +8,7 @@
 - Fehlervermeidung
 
 ## Was ist Pony?
+
 - Was ist das Aktormodell
 - Features vorstellen - Beispielprojekte
 - Vergleich mit anderen Sprachen
@@ -16,6 +16,7 @@
 - Fazit
 
 ## Untersuchungsthemen
+
 - CSP
 - Deadlock
 - Data races

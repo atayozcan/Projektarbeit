@@ -1,36 +1,100 @@
 # Data Races
 
-## Was sind Data Races?
+Vergleich wie verschiedene Programmiersprachen mit Data Races umgehen.
 
-Ein Data Race tritt auf, wenn zwei oder mehr Threads gleichzeitig auf denselben Speicherbereich zugreifen und mindestens einer dieser Zugriffe ein Schreibvorgang ist. Da die Reihenfolge der Zugriffe nicht definiert ist, kann das Programm unvorhersehbare Ergebnisse liefern.
+## Das Problem
 
-## Das Problem in traditionellen Sprachen
+Ein Data Race tritt auf, wenn:
+1. Zwei oder mehr Threads auf denselben Speicher zugreifen
+2. Mindestens einer schreibt
+3. Keine Synchronisation stattfindet
 
-In Sprachen wie C++, Go und anderen traditionellen Programmiersprachen ist es einfach, versehentlich Data Races zu erzeugen. Threads teilen sich standardmäßig den Speicher, und der Programmierer muss aktiv Maßnahmen ergreifen, um den Zugriff zu synchronisieren.
+```
+Thread 1: Liest counter (= 0)
+Thread 2: Liest counter (= 0)
+Thread 1: Schreibt counter = 1
+Thread 2: Schreibt counter = 1  ← Inkrement verloren!
+```
 
-### Typische Lösungsansätze
+## Sprachen im Vergleich
 
-- **Mutex**: Sperrt kritische Bereiche für andere Threads
-- **Atomare Operationen**: Garantieren unteilbare Lese-/Schreibvorgänge
-- **Condition Variables**: Ermöglichen Threads, auf bestimmte Bedingungen zu warten
+| Sprache | Version | Data Race möglich? | Schutz |
+|---------|---------|-------------------|--------|
+| C++ | 26 | Ja | Manuell (mutex/atomic) |
+| Go | 1.25.5 | Ja | Race Detector (Runtime) |
+| Swift | 6.2 | Ja* | Strict Concurrency |
+| Rust | 2024 | Nein | Ownership System |
+| **Pony** | - | **Nein** | **Reference Capabilities** |
 
-Diese Lösungen sind fehleranfällig und erfordern manuelle Sorgfalt vom Programmierer.
+*Swift 6 warnt, aber erlaubt unsicheren Code
 
-## Ponys Lösung: Reference Capabilities
+## Standardisierte Test-Ausgabe
 
-Pony eliminiert Data Races zur Kompilierzeit durch sein innovatives System der Reference Capabilities. Jede Referenz auf ein Objekt trägt Informationen darüber, wie sie verwendet werden darf:
+```
+=== Data Race Test: [Sprache] ===
 
-- **iso** (isolated): Nur ein Alias existiert, kann sicher zwischen Actors übertragen werden
-- **val** (value): Unveränderlich, kann von mehreren Actors gelesen werden
-- **ref** (reference): Veränderlich, aber nur innerhalb eines Actors nutzbar
-- **box**: Lesezugriff, unabhängig davon ob das Original veränderlich ist
-- **tag**: Nur für Identitätsvergleiche, kein Lese-/Schreibzugriff
-- **trn** (transition): Schreibzugriff, kann zu val konvertiert werden
+Setup: Two threads incrementing a shared counter
+Each thread: 100000 increments
+Expected result: 200000
 
-Da Actors keine veränderlichen Daten teilen können und nur über asynchrone Nachrichten kommunizieren, sind Data Races in Pony strukturell unmöglich.
+--- Running Test ---
+Thread 1: Starting...
+Thread 2: Starting...
+Thread 1: Finished
+Thread 2: Finished
+
+--- Result ---
+Counter: [Wert]
+Status: RACE DETECTED / NO RACE
+```
 
 ## Verzeichnisstruktur
 
-- `cpp/` - C++ Beispiel mit ungeschütztem Zähler
-- `go/` - Go Beispiel mit Goroutinen
-- `pony/` - Pony Beispiel mit Reference Capabilities
+```
+data-races/
+├── README.md
+├── cpp/
+│   ├── README.md
+│   ├── CMakeLists.txt
+│   └── main.cpp
+├── go/
+│   ├── README.md
+│   ├── go.mod
+│   └── main.go
+├── pony/
+│   ├── README.md
+│   └── main.pony
+├── rust/
+│   ├── README.md
+│   ├── Cargo.toml
+│   └── main.rs
+└── swift/
+    ├── README.md
+    └── main.swift
+```
+
+## Ausführen
+
+```bash
+# C++26
+cd cpp && cmake -B build && cmake --build build && ./build/DataRaces
+
+# Go 1.25.5 (mit Race Detector)
+cd go && go run -race main.go
+
+# Rust 2024
+cd rust && cargo run
+
+# Swift 6.2
+cd swift && swift main.swift
+
+# Pony
+cd pony && ponyc && ./data-races
+```
+
+## Kernaussage
+
+| Kategorie | Sprachen | Beschreibung |
+|-----------|----------|--------------|
+| Unsicher | C++, Go, Swift | Data Races möglich, Tools helfen |
+| **Sicher** | **Rust, Pony** | **Compiler verhindert Data Races** |

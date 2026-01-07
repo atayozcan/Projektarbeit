@@ -1,12 +1,83 @@
-Das C++ Beispiel für ein Datenleck ruft lediglich eine Funktion auf die einen Pointer auf dem Heap alloziert.
-Das Problem ist, dass der Speicher nie freigegeben wird und somit für die Dauer der Ausführung belegt bleibt.
-Dies kann viel Speicher verbrauchen, wenn solche Aufrufe sehr häufig vorkommen, oder sogar zum Crash führen.
+# C++26: Memory Leak Demonstration
 
-Es gibt verschiedene Strategien, um dieses Verhalten in C++ Programmen zu vermeiden.
+## Das Problem
 
-### Smart Pointers
-Smart Pointers sorgen dafür, dass der Speicher wieder freigegeben wird, sobald der Pointer nicht mehr nutzbar ist.
+```cpp
+void leak_memory() {
+    auto ptr = new int[1000];
+    // Funktion endet - ptr ist weg
+    // Aber der Speicher bleibt alloziert!
+}
+```
 
-### Constructor and Destructor
-Bei Klassen kann man neben einem Konstruktor zum Erstellen des Objekts auch einen Destruktor definieren, 
-der alle Pointer löschen kann, die zur Klasse gehören.
+Der allozierte Speicher wird nie freigegeben.
+
+## Typische Ausgabe
+
+```
+=== Memory Leak Test: C++26 ===
+
+--- Test 1: Memory Leak ---
+Allocating 1000 ints without freeing...
+Function returned - memory NOT freed!
+Status: LEAK (Speicher verloren)
+
+--- Test 2: Safe Alternative (unique_ptr) ---
+Allocating 1000 ints with unique_ptr...
+Function returned - memory automatically freed!
+Status: NO LEAK (RAII)
+```
+
+## Lösungen in C++
+
+### 1. Smart Pointers (Empfohlen)
+```cpp
+// unique_ptr - einziger Owner
+auto ptr = std::make_unique<int[]>(1000);
+// Automatisch freigegeben bei Scope-Ende
+
+// shared_ptr - mehrere Owner
+auto ptr = std::make_shared<int>(42);
+// Freigegeben wenn letzter Owner weg
+```
+
+### 2. RAII (Resource Acquisition Is Initialization)
+```cpp
+class Resource {
+    int* data;
+public:
+    Resource() : data(new int[1000]) {}
+    ~Resource() { delete[] data; }  // Destruktor gibt frei
+};
+```
+
+### 3. Container statt Raw Pointers
+```cpp
+std::vector<int> data(1000);  // Automatisch verwaltet
+```
+
+## Leak Detection Tools
+
+```bash
+# Valgrind
+valgrind --leak-check=full ./program
+
+# AddressSanitizer
+g++ -fsanitize=address -g main.cpp
+./a.out
+```
+
+## Vergleich mit Pony
+
+| Aspekt | C++26 | Pony |
+|--------|-------|------|
+| Memory Management | Manuell | Automatisch (GC) |
+| Smart Pointers | Ja (optional) | Nicht nötig |
+| Leak möglich | Ja | Nein* |
+| Performance | Höchste Kontrolle | GC-Overhead |
+
+*Pony's ORCA GC verhindert klassische Leaks
+
+## Fazit
+
+C++ bietet mit Smart Pointers und RAII gute Werkzeuge, aber der Programmierer muss sie aktiv nutzen. Raw `new`/`delete` sollte vermieden werden.
