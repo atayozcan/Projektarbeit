@@ -1,20 +1,22 @@
-#include <iostream>
-#include <thread>
-#include <mutex>
-#include <vector>
+// Dining Philosophers in C++26
 #include <chrono>
+#include <mutex>
+#include <print>
+#include <thread>
+#include <vector>
+
+using namespace std;
 
 constexpr int N = 5;
-std::mutex forks[N];
+mutex forks[N];
 
 [[noreturn]] void philosopher(const int id) {
     const int left = id;
     const int right = (id + 1) % N;
 
     while (true) {
-        // Denken
-        std::cout << "Philosoph " << id << " denkt.\n";
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        println("Philosoph {}: denkt", id);
+        this_thread::sleep_for(chrono::milliseconds(500));
 
         // Deadlock-Vermeidung: letzter Philosoph greift umgekehrt
         if (id == N - 1) {
@@ -25,9 +27,8 @@ std::mutex forks[N];
             forks[right].lock();
         }
 
-        // Essen
-        std::cout << "Philosoph " << id << " isst.\n";
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        println("Philosoph {}: isst", id);
+        this_thread::sleep_for(chrono::milliseconds(500));
 
         forks[left].unlock();
         forks[right].unlock();
@@ -35,8 +36,14 @@ std::mutex forks[N];
 }
 
 int main() {
-    std::vector<std::thread> philosophers;
+    println("=== Dining Philosophers: C++26 ===");
+    println("");
+    println("Setup: 5 Philosophen, 5 Gabeln (Mutexe)");
+    println("Deadlock-Vermeidung: Letzter Philosoph greift umgekehrt");
+    println("");
+    println("--- Running ---");
 
+    vector<thread> philosophers;
     for (int i = 0; i < N; i++) {
         philosophers.emplace_back(philosopher, i);
     }

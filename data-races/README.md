@@ -55,11 +55,9 @@ data-races/
 ├── README.md
 ├── cpp/
 │   ├── README.md
-│   ├── CMakeLists.txt
 │   └── main.cpp
 ├── go/
 │   ├── README.md
-│   ├── go.mod
 │   └── main.go
 ├── pony/
 │   ├── README.md
@@ -67,7 +65,7 @@ data-races/
 ├── rust/
 │   ├── README.md
 │   ├── Cargo.toml
-│   └── main.rs
+│   └── src/main.rs
 └── swift/
     ├── README.md
     └── main.swift
@@ -77,7 +75,7 @@ data-races/
 
 ```bash
 # C++26
-cd cpp && cmake -B build && cmake --build build && ./build/DataRaces
+cd cpp && g++ -std=c++26 main.cpp -o main && ./main
 
 # Go 1.25.5 (mit Race Detector)
 cd go && go run -race main.go

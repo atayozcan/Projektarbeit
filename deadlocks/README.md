@@ -38,10 +38,13 @@ Rust und Swift verhindern Data Races, aber **nicht** Deadlocks!
 ## Standardisierte Test-Ausgabe
 
 ```
-=== Deadlock Example ===
-This program will intentionally deadlock.
-You'll need to forcefully terminate it (Ctrl+C).
+=== Deadlock Test: [Sprache] ===
 
+Setup: Two threads acquiring two mutexes in opposite order
+Thread 1: mutex1 -> mutex2
+Thread 2: mutex2 -> mutex1
+
+--- Running Test ---
 Thread 1: Starting...
 Thread 1: Locked mutex1
 Thread 2: Starting...
@@ -53,8 +56,8 @@ Thread 2: Trying to lock mutex1...
 
 **Pony-Ausgabe** (einzige die terminiert):
 ```
-Thread 1: Completed successfully!
-Thread 2: Completed successfully!
+Actor 1: Completed successfully!
+Actor 2: Completed successfully!
 ```
 
 ## Verzeichnisstruktur
@@ -64,15 +67,13 @@ deadlocks/
 ├── README.md
 ├── cpp/
 │   ├── README.md
-│   ├── CMakeLists.txt
 │   └── main.cpp
 ├── go/
 │   ├── README.md
-│   ├── go.mod
-│   └── deadlocks.go
+│   └── main.go
 ├── pony/
 │   ├── README.md
-│   └── deadlocks.pony
+│   └── main.pony
 ├── rust/
 │   ├── README.md
 │   ├── Cargo.toml
@@ -86,10 +87,10 @@ deadlocks/
 
 ```bash
 # C++26
-cd cpp && cmake -B build && cmake --build build && ./build/Deadlocks
+cd cpp && g++ -std=c++26 main.cpp -o main && ./main
 
 # Go 1.25.5
-cd go && go run deadlocks.go
+cd go && go run main.go
 
 # Rust 2024
 cd rust && cargo run

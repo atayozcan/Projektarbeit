@@ -62,22 +62,33 @@ memory-leaks/
 ├── README.md
 ├── cpp/
 │   ├── README.md
-│   ├── CMakeLists.txt
 │   └── main.cpp
-└── go/
+├── go/
+│   ├── README.md
+│   └── main.go
+├── rust/
+│   ├── README.md
+│   ├── Cargo.toml
+│   └── src/main.rs
+└── swift/
     ├── README.md
-    ├── go.mod
-    └── main.go
+    └── main.swift
 ```
 
 ## Ausführen
 
 ```bash
 # C++26
-cd cpp && cmake -B build && cmake --build build && ./build/MemoryLeaks
+cd cpp && g++ -std=c++26 main.cpp -o main && ./main
 
 # Go 1.25.5
 cd go && go run main.go
+
+# Rust 2024
+cd rust && cargo run
+
+# Swift 6.2
+cd swift && swift main.swift
 ```
 
 ## Kernaussage

@@ -1,68 +1,56 @@
+// Deadlock Demonstration in C++26
 #include <chrono>
-#include <iostream>
 #include <mutex>
+#include <print>
 #include <thread>
 
 using namespace std;
 
-// Two mutexes that will be used to create a deadlock
 mutex mutex1, mutex2;
 
 void thread1Function() {
-  fprintf(stdout, "Thread 1: Starting...\n");
+    println("Thread 1: Starting...");
+    lock_guard lock1(mutex1);
+    println("Thread 1: Locked mutex1");
 
-  // Thread 1 locks mutex1 first
-  lock_guard lock1(mutex1);
+    this_thread::sleep_for(chrono::milliseconds(100));
 
-  fprintf(stdout, "Thread 1: Locked mutex1\n");
-  // Small delay to ensure both threads have acquired their first lock
-  this_thread::sleep_for(chrono::milliseconds(100L));
-
-  fprintf(stdout, "Thread 1: Trying to lock mutex2...\n");
-  // Thread 1 then tries to lock mutex2 (but thread2 has it)
-  lock_guard lock2(mutex2);
-  fprintf(stdout, "Thread 1: Locked mutex2\n");
-
-  // This code will never be reached due to deadlock
-  fprintf(stdout, "Thread 1: Completed successfully!\n");
+    println("Thread 1: Trying to lock mutex2...");
+    lock_guard lock2(mutex2);
+    println("Thread 1: Locked mutex2");
+    println("Thread 1: Completed successfully!");
 }
 
 void thread2Function() {
-  fprintf(stdout, "Thread 2: Starting...\n");
+    println("Thread 2: Starting...");
+    lock_guard lock2(mutex2);
+    println("Thread 2: Locked mutex2");
 
-  // Thread 2 locks mutex2 first (opposite order from thread1)
-  lock_guard lock2(mutex2);
-  fprintf(stdout, "Thread 2: Locked mutex2\n");
+    this_thread::sleep_for(chrono::milliseconds(100));
 
-  // Small delay to ensure both threads have acquired their first lock
-  this_thread::sleep_for(chrono::milliseconds(100L));
-
-  fprintf(stdout, "Thread 2: Trying to lock mutex1...\n");
-  // Thread 2 then tries to lock mutex1 (but thread1 has it)
-  lock_guard lock1(mutex1);
-  fprintf(stdout, "Thread 2: Locked mutex1\n");
-
-  // This code will never be reached due to deadlock
-  fprintf(stdout, "Thread 2: Completed successfully!\n");
+    println("Thread 2: Trying to lock mutex1...");
+    lock_guard lock1(mutex1);
+    println("Thread 2: Locked mutex1");
+    println("Thread 2: Completed successfully!");
 }
 
 int main() {
-  fprintf(stdout, R"(
-=== Deadlock Example ===
-This program will intentionally deadlock.
-You'll need to forcefully terminate it (Ctrl+C).
+    println("=== Deadlock Test: C++26 ===");
+    println("");
+    println("Setup: Two threads acquiring two mutexes in opposite order");
+    println("Thread 1: mutex1 -> mutex2");
+    println("Thread 2: mutex2 -> mutex1");
+    println("");
+    println("--- Running Test ---");
 
-)");
+    thread t1(thread1Function);
+    thread t2(thread2Function);
 
-  // Create two threads
-  thread t1(thread1Function);
-  thread t2(thread2Function);
+    t1.join();
+    t2.join();
 
-  // Wait for threads to complete (they never will due to deadlock)
-  t1.join();
-  t2.join();
-
-  // This line will never be reached
-  fprintf(stdout, "Program completed successfully!\n");
-  return EXIT_SUCCESS;
+    println("");
+    println("--- Result ---");
+    println("Status: DEADLOCK (program hangs, Ctrl+C to exit)");
+    return 0;
 }

@@ -1,12 +1,12 @@
+// Deadlock Demonstration in Swift 6.2
 import Foundation
 
-// Two actors that will be used to create a deadlock
 actor Resource1 {
     private var holder: String? = nil
 
-    func acquire(by thread: String) async {
-        holder = thread
-        print("\(thread): Locked resource1")
+    func acquire(by task: String) async {
+        holder = task
+        print("\(task): Locked resource1")
     }
 
     func release() {
@@ -17,9 +17,9 @@ actor Resource1 {
 actor Resource2 {
     private var holder: String? = nil
 
-    func acquire(by thread: String) async {
-        holder = thread
-        print("\(thread): Locked resource2")
+    func acquire(by task: String) async {
+        holder = task
+        print("\(task): Locked resource2")
     }
 
     func release() {
@@ -27,58 +27,53 @@ actor Resource2 {
     }
 }
 
-// Shared resources
 let resource1 = Resource1()
 let resource2 = Resource2()
 
-func thread1Function() async {
-    print("Thread 1: Starting...")
+func task1Function() async {
+    print("Task 1: Starting...")
+    await resource1.acquire(by: "Task 1")
 
-    // Thread 1 locks resource1 first
-    await resource1.acquire(by: "Thread 1")
-
-    // Small delay to ensure both threads have acquired their first lock
     try? await Task.sleep(nanoseconds: 100_000_000)
 
-    print("Thread 1: Trying to lock resource2...")
-    // Thread 1 then tries to lock resource2 (but thread2 has it)
-    await resource2.acquire(by: "Thread 1")
-
-    // This code will never be reached due to deadlock
-    print("Thread 1: Completed successfully!")
+    print("Task 1: Trying to lock resource2...")
+    await resource2.acquire(by: "Task 1")
+    print("Task 1: Completed successfully!")
 }
 
-func thread2Function() async {
-    print("Thread 2: Starting...")
+func task2Function() async {
+    print("Task 2: Starting...")
+    await resource2.acquire(by: "Task 2")
 
-    // Thread 2 locks resource2 first (opposite order from thread1)
-    await resource2.acquire(by: "Thread 2")
-
-    // Small delay to ensure both threads have acquired their first lock
     try? await Task.sleep(nanoseconds: 100_000_000)
 
-    print("Thread 2: Trying to lock resource1...")
-    // Thread 2 then tries to lock resource1 (but thread1 has it)
-    await resource1.acquire(by: "Thread 2")
-
-    // This code will never be reached due to deadlock
-    print("Thread 2: Completed successfully!")
+    print("Task 2: Trying to lock resource1...")
+    await resource1.acquire(by: "Task 2")
+    print("Task 2: Completed successfully!")
 }
 
-print("")
-print("=== Deadlock Example (Swift Actors) ===")
-print("This program demonstrates a deadlock using Swift actors.")
-print("You'll need to forcefully terminate it (Ctrl+C).")
-print("")
+print("=== Deadlock Test: Swift 6.2 ===")
+print()
+print("Setup: Two tasks acquiring two resources in opposite order")
+print("Task 1: resource1 -> resource2")
+print("Task 2: resource2 -> resource1")
+print()
+print("--- Running Test ---")
 
-// Create two concurrent tasks
 Task {
-    await thread1Function()
+    await task1Function()
 }
 
 Task {
-    await thread2Function()
+    await task2Function()
 }
 
-// Keep the program running
+// Note: Program hangs here due to deadlock
+// The result section below will never be reached
+DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+    print()
+    print("--- Result ---")
+    print("Status: DEADLOCK (program hangs, Ctrl+C to exit)")
+}
+
 RunLoop.main.run()

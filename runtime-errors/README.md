@@ -70,24 +70,22 @@ Method: [sprachspezifisch]
 
 ```
 runtime-errors/
-├── README.md           # Diese Datei
+├── README.md
 ├── cpp/
-│   ├── README.md       # C++26 Analyse
-│   ├── CMakeLists.txt
+│   ├── README.md
 │   └── main.cpp
 ├── go/
-│   ├── README.md       # Go 1.25.5 Analyse
-│   ├── go.mod
+│   ├── README.md
 │   └── main.go
 ├── pony/
-│   ├── README.md       # Pony Analyse
+│   ├── README.md
 │   └── main.pony
 ├── rust/
-│   ├── README.md       # Rust 2024 Analyse
+│   ├── README.md
 │   ├── Cargo.toml
-│   └── main.rs
+│   └── src/main.rs
 └── swift/
-    ├── README.md       # Swift 6.2 Analyse
+    ├── README.md
     └── main.swift
 ```
 
@@ -95,7 +93,7 @@ runtime-errors/
 
 ```bash
 # C++26
-cd cpp && cmake -B build && cmake --build build && ./build/RuntimeErrors
+cd cpp && g++ -std=c++26 main.cpp -o main && ./main
 
 # Go 1.25.5
 cd go && go run main.go
