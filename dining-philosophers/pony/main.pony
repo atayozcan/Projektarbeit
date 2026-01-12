@@ -1,8 +1,3 @@
-// Dining Philosophers in Pony
-// Das Actor Model verhindert Deadlocks durch asynchrone Nachrichten
-
-use "time"
-
 actor Fork
   var _in_use: Bool = false
   var _waiting: Array[Philosopher] = Array[Philosopher]
@@ -19,6 +14,7 @@ actor Fork
     if _waiting.size() > 0 then
       try
         let next = _waiting.shift()?
+        // Fork stays in use, ownership passes directly
         next.got_fork()
       end
     else
@@ -30,99 +26,93 @@ actor Philosopher
   let _id: USize
   let _left: Fork
   let _right: Fork
+
   var _has_left: Bool = false
   var _has_right: Bool = false
-  let _timers: Timers = Timers
 
   new create(env: Env, id: USize, left: Fork, right: Fork) =>
     _env = env
     _id = id
     _left = left
     _right = right
+
+  be start() =>
     think()
 
   be think() =>
-    _env.out.print("Philosoph " + _id.string() + ": denkt")
-    let timer = Timer(ThinkNotify(this), 500_000_000, 0)
-    _timers(consume timer)
+    _env.out.print("Philosopher " + _id.string() + " is thinking")
+    get_fork()
 
-  be done_thinking() =>
-    // Deadlock-Vermeidung: letzter Philosoph greift umgekehrt
-    if _id == 4 then
-      _right.acquire(this)
+  be get_fork() =>
+    // asymmetric grabbing to prevent deadlocks
+    if ((_id % 2) == 0) then
+      if not _has_left then
+        _left.acquire(this)
+      elseif not _has_right then
+        _right.acquire(this)
+      end
     else
-      _left.acquire(this)
+      if not _has_right then
+        _right.acquire(this)
+      elseif not _has_left then
+        _left.acquire(this)
+      end
     end
 
   be got_fork() =>
-    if _id == 4 then
-      if not _has_right then
-        _has_right = true
-        _left.acquire(this)
-      else
-        _has_left = true
-        eat()
-      end
-    else
+    if ((_id % 2) == 0) then
       if not _has_left then
         _has_left = true
-        _right.acquire(this)
       else
         _has_right = true
-        eat()
       end
+    else
+      if not _has_right then
+        _has_right = true
+      else
+        _has_left = true
+      end
+    end
+
+    if _has_left and _has_right then
+      eat()
+    else
+      get_fork()
     end
 
   be eat() =>
-    _env.out.print("Philosoph " + _id.string() + ": isst")
-    let timer = Timer(EatNotify(this), 500_000_000, 0)
-    _timers(consume timer)
-
-  be done_eating() =>
-    _has_left = false
-    _has_right = false
+    _env.out.print("Philosopher " + _id.string() + " is eating")
+    // release forks immediately
     _left.release()
     _right.release()
-    think()
-
-class ThinkNotify is TimerNotify
-  let _philosopher: Philosopher
-
-  new iso create(philosopher: Philosopher) =>
-    _philosopher = philosopher
-
-  fun ref apply(timer: Timer, count: U64): Bool =>
-    _philosopher.done_thinking()
-    false
-
-class EatNotify is TimerNotify
-  let _philosopher: Philosopher
-
-  new iso create(philosopher: Philosopher) =>
-    _philosopher = philosopher
-
-  fun ref apply(timer: Timer, count: U64): Bool =>
-    _philosopher.done_eating()
-    false
+    _has_left = false
+    _has_right = false
+    think() // think again (loop indefinitely)
 
 actor Main
   new create(env: Env) =>
-    env.out.print("=== Dining Philosophers: Pony ===")
-    env.out.print("")
-    env.out.print("Setup: 5 Philosophen, 5 Gabeln (Actors)")
-    env.out.print("Deadlock-Vermeidung: Actor Model (asynchrone Nachrichten)")
-    env.out.print("")
-    env.out.print("--- Running ---")
+    let forks: Array[Fork] = Array[Fork]
+    let philosophers: Array[Philosopher] = Array[Philosopher]
 
-    let forks = Array[Fork](5)
-    for i in Range(0, 5) do
+    // create 5 forks
+    var i: USize = 0
+    while i < 5 do
       forks.push(Fork)
+      i = i + 1
     end
 
-    try
-      for i in Range(0, 5) do
+    // create 5 philosophers
+    i = 0
+    while i < 5 do
+      try
         let left = forks(i)?
-        let right = forks((i + 1) % 5)?
-        Philosopher(env, i, left, right)
+        let right = forks(((i + 1) % 5))?
+        philosophers.push(Philosopher(env, i, left, right))
       end
+      i = i + 1
+    end
+
+    // start all philosophers
+    for p in philosophers.values() do
+      p.start()
     end
