@@ -14,7 +14,6 @@ actor Fork
     if _waiting.size() > 0 then
       try
         let next = _waiting.shift()?
-        // Fork stays in use, ownership passes directly
         next.got_fork()
       end
     else
@@ -57,6 +56,13 @@ actor Philosopher
       elseif not _has_left then
         _left.acquire(this)
       end
+
+      // No asymmetric grabbing: always try left then right
+      //if not _has_left then
+        //_left.acquire(this)
+      //elseif not _has_right then
+        //_right.acquire(this)
+      //end
     end
 
   be got_fork() =>
@@ -82,12 +88,11 @@ actor Philosopher
 
   be eat() =>
     _env.out.print("Philosopher " + _id.string() + " is eating")
-    // release forks immediately
     _left.release()
     _right.release()
     _has_left = false
     _has_right = false
-    think() // think again (loop indefinitely)
+    think()
 
 actor Main
   new create(env: Env) =>
@@ -95,15 +100,17 @@ actor Main
     let philosophers: Array[Philosopher] = Array[Philosopher]
 
     // create 5 forks
+    let n: USize = 5
     var i: USize = 0
-    while i < 5 do
+    while i < n do
       forks.push(Fork)
       i = i + 1
     end
 
     // create 5 philosophers
     i = 0
-    while i < 5 do
+
+    while i < n do
       try
         let left = forks(i)?
         let right = forks(((i + 1) % 5))?
@@ -112,7 +119,7 @@ actor Main
       i = i + 1
     end
 
-    // start all philosophers
+    // start the hunger games!
     for p in philosophers.values() do
       p.start()
     end
