@@ -1,1 +1,14 @@
 .idea/
+
+# Compiled binaries
+*.out
+**/cpp/main
+**/go/main
+**/swift/main
+**/pony/pony
+
+# Rust
+**/rust/target/
+
+# macOS
+.DS_Store

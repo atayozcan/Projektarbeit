@@ -19,9 +19,8 @@ if (id == N - 1) {
 ## Kompilieren und Ausführen
 
 ```bash
-cmake -B build
-cmake --build build
-./build/DiningPhilosophers
+g++ -std=c++26 main.cpp -o main -pthread
+./main
 ```
 
 ## Ausgabe
