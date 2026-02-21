@@ -1,4 +1,4 @@
-# Pony: Data Race Prevention
+# Data Races - Pony
 
 ## Pony's Ansatz
 

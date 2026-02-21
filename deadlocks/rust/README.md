@@ -1,4 +1,4 @@
-# Rust 2024: Deadlock Demonstration
+# Deadlocks - Rust 2024
 
 ## Das Problem
 
@@ -32,7 +32,7 @@ Rust verhindert **Data Races**, aber **nicht Deadlocks**!
 cargo run
 ```
 
-## Typische Ausgabe
+## Ausgabe
 
 ```
 Thread 1: Starting...

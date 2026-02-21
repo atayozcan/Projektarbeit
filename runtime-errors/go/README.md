@@ -1,4 +1,4 @@
-# Go 1.25.5: Out-of-Bounds Fehlerbehandlung
+# Runtime Errors - Go 1.25.5
 
 ## Verfügbare Methoden
 

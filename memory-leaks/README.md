@@ -29,13 +29,9 @@ void leak() {
 
 *Mit Smart Pointers / starken Referenzen möglich
 
-## Warum kein Pony-Beispiel?
+## Pony: ORCA GC
 
-Pony verwendet ORCA (Ownership and Reference Counting for Actors):
-- **Kein Stop-the-World**: Jeder Actor hat eigenen GC
-- **Keine GC-Pausen**: Garbage Collection läuft nebenläufig
-- **Automatische Freigabe**: Programmierer kümmert sich nicht um Speicher
-- **Keine Goroutine-Leaks**: Actors ohne Nachrichten werden beendet
+Pony verhindert Memory Leaks strukturell durch ORCA (Ownership and Reference Counting for Actors). Das Pony-Beispiel demonstriert, warum Leaks unmöglich sind.
 
 ## Standardisierte Test-Ausgabe
 
@@ -66,6 +62,9 @@ memory-leaks/
 ├── go/
 │   ├── README.md
 │   └── main.go
+├── pony/
+│   ├── README.md
+│   └── main.pony
 ├── rust/
 │   ├── README.md
 │   ├── Cargo.toml
@@ -83,6 +82,9 @@ cd cpp && g++ -std=c++26 main.cpp -o main && ./main
 
 # Go 1.25.5
 cd go && go run main.go
+
+# Pony
+cd pony && ponyc && ./pony
 
 # Rust 2024
 cd rust && cargo run

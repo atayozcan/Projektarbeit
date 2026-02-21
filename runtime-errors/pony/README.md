@@ -1,4 +1,4 @@
-# Pony: Out-of-Bounds Fehlerbehandlung
+# Runtime Errors - Pony
 
 ## Verfügbare Methoden
 

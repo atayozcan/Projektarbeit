@@ -62,5 +62,12 @@ int main() {
     println("Result: {}", default_value);
     println("");
 
+    // Test 5: Iterator
+    println("--- Test 5: Iterator ---");
+    println("Method: for (auto v : vec)");
+    for (size_t i = 0; i < vec.size(); i++) {
+        println("[{}] = {}", i, vec[i]);
+    }
+
     return 0;
 }

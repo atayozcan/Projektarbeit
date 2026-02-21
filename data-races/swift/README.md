@@ -1,4 +1,4 @@
-# Swift 6.2: Data Race Prevention
+# Data Races - Swift 6.2
 
 ## Swift 6.2 Features verwendet
 
@@ -58,26 +58,6 @@ var shared = 0
 Task { shared += 1 }  // Error: Mutation of captured var 'shared'
 ```
 
-## Kompilieren und Ausführen
-
-```bash
-swift main.swift
-```
-
-## Test-Ergebnisse
-
-### Unsicher (`nonisolated(unsafe)`)
-```
-Counter: 156789  (erwartet: 200000)
-Status: RACE DETECTED (lost 43211 increments)
-```
-
-### Sicher (Actor)
-```
-Counter: 200000
-Status: NO RACE (Actor guarantees safety)
-```
-
 ## Swift 6.2 vs. Frühere Versionen
 
 | Feature | Swift 5 | Swift 6.0 | Swift 6.2 |
@@ -86,16 +66,6 @@ Status: NO RACE (Actor guarantees safety)
 | Strict Concurrency | Opt-in | Default | Verbessert |
 | `nonisolated(unsafe)` | Nein | Nein | Ja |
 | MainActor by default | Nein | Nein | Optional |
-
-## Vergleich mit Pony
-
-| Aspekt | Swift 6.2 | Pony |
-|--------|-----------|------|
-| Actor Model | Ja | Ja |
-| Strict Checking | Default (Warnings) | Immer (Errors) |
-| Unsafe Escape | `nonisolated(unsafe)` | Nicht möglich |
-| Blocking | `await` (synchron) | Nie (asynchron) |
-| Data Races | Möglich (mit unsafe) | Unmöglich |
 
 ## Der Unterschied: Warnings vs. Errors
 
@@ -110,6 +80,36 @@ var x: U32 = 0  // Innerhalb Actor OK
 // Sharing zwischen Actors: COMPILE ERROR
 ```
 
+## Kompilieren und Ausführen
+
+```bash
+swift main.swift
+```
+
+## Ausgabe
+
+### Unsicher (`nonisolated(unsafe)`)
+```
+Counter: 156789  (erwartet: 200000)
+Status: RACE DETECTED (lost 43211 increments)
+```
+
+### Sicher (Actor)
+```
+Counter: 200000
+Status: NO RACE (Actor guarantees safety)
+```
+
+## Vergleich mit Pony
+
+| Aspekt | Swift 6.2 | Pony |
+|--------|-----------|------|
+| Actor Model | Ja | Ja |
+| Strict Checking | Default (Warnings) | Immer (Errors) |
+| Unsafe Escape | `nonisolated(unsafe)` | Nicht möglich |
+| Blocking | `await` (synchron) | Nie (asynchron) |
+| Data Races | Möglich (mit unsafe) | Unmöglich |
+
 ## Fazit
 
 Swift 6.2 macht große Fortschritte bei Concurrency Safety:
@@ -119,9 +119,3 @@ Swift 6.2 macht große Fortschritte bei Concurrency Safety:
 
 **Aber**: `nonisolated(unsafe)` erlaubt weiterhin unsicheren Code.
 Pony hat keine solche Escape-Hatch.
-
-## Quellen
-
-- [Swift 6.2 Released](https://www.swift.org/blog/swift-6.2-released/)
-- [Exploring concurrency changes in Swift 6.2](https://www.donnywals.com/exploring-concurrency-changes-in-swift-6-2/)
-- [Swift 6.2 Concurrency Changes](https://www.avanderlee.com/concurrency/swift-6-2-concurrency-changes/)

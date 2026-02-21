@@ -39,7 +39,7 @@ actor Philosopher
     think()
 
   be think() =>
-    _env.out.print("Philosopher " + _id.string() + " is thinking")
+    _env.out.print("Philosoph " + _id.string() + ": denkt")
     get_fork()
 
   be get_fork() =>
@@ -87,7 +87,7 @@ actor Philosopher
     end
 
   be eat() =>
-    _env.out.print("Philosopher " + _id.string() + " is eating")
+    _env.out.print("Philosoph " + _id.string() + ": isst")
     _left.release()
     _right.release()
     _has_left = false
@@ -96,6 +96,13 @@ actor Philosopher
 
 actor Main
   new create(env: Env) =>
+    env.out.print("=== Dining Philosophers: Pony ===")
+    env.out.print("")
+    env.out.print("Setup: 5 Philosophen, 5 Gabeln (Actors)")
+    env.out.print("Deadlock-Vermeidung: Actor Model (asynchrone Nachrichten)")
+    env.out.print("")
+    env.out.print("--- Running ---")
+
     let forks: Array[Fork] = Array[Fork]
     let philosophers: Array[Philosopher] = Array[Philosopher]
 

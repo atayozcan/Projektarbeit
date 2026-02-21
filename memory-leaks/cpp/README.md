@@ -1,4 +1,4 @@
-# C++26: Memory Leak Demonstration
+# Memory Leaks - C++26
 
 ## Das Problem
 
@@ -18,7 +18,7 @@ Der allozierte Speicher wird nie freigegeben.
 g++ -std=c++26 main.cpp -o main && ./main
 ```
 
-## Typische Ausgabe
+## Ausgabe
 
 ```
 === Memory Leak Test: C++26 ===

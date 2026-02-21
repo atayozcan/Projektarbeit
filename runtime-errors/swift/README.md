@@ -1,4 +1,4 @@
-# Swift 6.2: Out-of-Bounds Fehlerbehandlung
+# Runtime Errors - Swift 6.2
 
 ## Swift 6.2 Features verwendet
 
@@ -113,8 +113,3 @@ Swift 6.2's Typed Throws ist ein großer Fortschritt:
 - Exhaustive `catch` Blöcke
 
 Aber: Array-Subscript `[]` bleibt unsicher und `try!` erlaubt Ignorieren.
-
-## Quellen
-
-- [Swift 6.2 Released](https://www.swift.org/blog/swift-6.2-released/)
-- [What's new in Swift 6.2](https://www.hackingwithswift.com/articles/277/whats-new-in-swift-6-2)

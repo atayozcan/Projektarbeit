@@ -24,7 +24,7 @@ fn main() {
     println!("  thread::spawn(|| counter += 1);  // ERROR: cannot borrow");
     println!();
 
-    println!("--- Running Safe Alternative (AtomicI32) ---");
+    println!("--- Running Test ---");
     println!("Thread 1: Starting...");
     println!("Thread 2: Starting...");
 

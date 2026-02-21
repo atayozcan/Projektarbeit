@@ -1,4 +1,4 @@
-# Go 1.25.5: Memory Leak Demonstration
+# Memory Leaks - Go 1.25.5
 
 ## Das Problem
 
@@ -29,7 +29,7 @@ func leaky() {
 go run main.go
 ```
 
-## Typische Ausgabe
+## Ausgabe
 
 ```
 === Memory Leak Test: Go 1.25.5 ===

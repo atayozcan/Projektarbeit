@@ -86,7 +86,7 @@ cd rust && cargo run
 cd swift && swift main.swift
 
 # Pony
-cd pony && ponyc && ./dining-philosophers
+cd pony && ponyc && ./pony
 ```
 
 ## Kernaussage

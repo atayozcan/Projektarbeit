@@ -1,4 +1,4 @@
-# C++26: Out-of-Bounds Fehlerbehandlung
+# Runtime Errors - C++26
 
 ## Verfügbare Methoden
 
@@ -74,7 +74,7 @@ if (result) {
 g++ -std=c++26 main.cpp -o main && ./main
 ```
 
-## Typische Ausgabe
+## Ausgabe
 
 ```
 === Out-of-Bounds Test: C++26 ===
@@ -88,7 +88,7 @@ terminate called after throwing an instance of 'std::out_of_range'
 Aborted (core dumped)
 ```
 
-Das Programm stürzt bei `vec.at(10)` ab, da keine Exception-Behandlung vorhanden ist. Die weiteren Tests (safe_access, try_access) werden nicht erreicht.
+Das Programm stürzt bei `vec.at(10)` ab, da keine Exception-Behandlung vorhanden ist. Die weiteren Tests (safe_access, try_access, Iterator) werden nicht erreicht.
 
 ## Vergleich mit Pony
 

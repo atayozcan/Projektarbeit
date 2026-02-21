@@ -99,7 +99,7 @@ cd rust && cargo run
 cd swift && swift main.swift
 
 # Pony (einziges das terminiert!)
-cd pony && ponyc && ./deadlocks
+cd pony && ponyc && ./pony
 ```
 
 ## Kernaussage

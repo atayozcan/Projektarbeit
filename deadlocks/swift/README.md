@@ -1,4 +1,4 @@
-# Swift 6: Deadlock Demonstration
+# Deadlocks - Swift 6.2
 
 ## Das Problem
 
@@ -30,24 +30,6 @@ Swift's Actor-Isolation verhindert **Data Races**, aber **nicht Deadlocks**!
 
 - Actor-Zugriff ist serialisiert ✓
 - Deadlocks durch `await` weiterhin möglich ✗
-
-## Kompilieren und Ausführen
-
-```bash
-swift main.swift
-```
-
-## Typische Ausgabe
-
-```
-Thread 1: Starting...
-Thread 1: Locked resource1
-Thread 2: Starting...
-Thread 2: Locked resource2
-Thread 1: Trying to lock resource2...
-Thread 2: Trying to lock resource1...
-[Programm hängt - Ctrl+C zum Beenden]
-```
 
 ## Warum Deadlock trotz Actors?
 
@@ -85,6 +67,29 @@ actor Resource {
 // Immer resource1 vor resource2 anfordern
 ```
 
+## Der entscheidende Unterschied
+
+**Swift**: `await actor.method()` - Wartet auf Antwort
+**Pony**: `actor.behavior()` - Schickt Nachricht, wartet nicht
+
+## Kompilieren und Ausführen
+
+```bash
+swift main.swift
+```
+
+## Ausgabe
+
+```
+Thread 1: Starting...
+Thread 1: Locked resource1
+Thread 2: Starting...
+Thread 2: Locked resource2
+Thread 1: Trying to lock resource2...
+Thread 2: Trying to lock resource1...
+[Programm hängt - Ctrl+C zum Beenden]
+```
+
 ## Vergleich mit Pony
 
 | Aspekt | Swift 6 | Pony |
@@ -93,11 +98,6 @@ actor Resource {
 | Message Passing | Synchron (`await`) | Asynchron |
 | Deadlock möglich | Ja | Nein |
 | Blocking | Ja (`await`) | Nein |
-
-## Der entscheidende Unterschied
-
-**Swift**: `await actor.method()` - Wartet auf Antwort
-**Pony**: `actor.behavior()` - Schickt Nachricht, wartet nicht
 
 ## Fazit
 

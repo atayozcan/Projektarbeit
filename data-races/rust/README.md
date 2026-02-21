@@ -1,4 +1,4 @@
-# Rust 2024: Data Race Prevention
+# Data Races - Rust 2024
 
 ## Rust's Ansatz
 

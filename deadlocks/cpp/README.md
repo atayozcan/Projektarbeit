@@ -1,4 +1,4 @@
-# C++26: Deadlock Demonstration
+# Deadlocks - C++26
 
 ## Das Problem
 
@@ -26,7 +26,7 @@ Beide Threads warten ewig aufeinander → **Deadlock**
 g++ -std=c++26 main.cpp -o main -pthread && ./main
 ```
 
-## Typische Ausgabe
+## Ausgabe
 
 ```
 Thread 1: Starting...

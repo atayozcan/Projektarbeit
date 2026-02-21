@@ -1,4 +1,4 @@
-# Pony: Deadlock Prevention
+# Deadlocks - Pony
 
 ## Pony's Ansatz
 
@@ -18,13 +18,42 @@ actor Thread2
     thread1.request_resource1(this)  // Nicht-blockierend!
 ```
 
+## Warum kein Deadlock?
+
+### 1. Asynchrone Nachrichten
+```pony
+thread2.request_resource2(this)  // Kehrt sofort zurück!
+```
+
+Der Actor schickt eine Nachricht und arbeitet weiter. Er wartet **nicht** auf Antwort.
+
+### 2. Keine Locks
+Pony hat keine Mutexes, Semaphoren oder andere Blocking-Primitives.
+
+### 3. Sequenzielle Nachrichtenverarbeitung
+Jeder Actor verarbeitet Nachrichten in einer Queue - eine nach der anderen.
+
+## Das Prinzip
+
+```
+Andere Sprachen:
+Thread 1: Lock A → Warte auf B → [BLOCKED]
+Thread 2: Lock B → Warte auf A → [BLOCKED]
+Ergebnis: DEADLOCK
+
+Pony:
+Actor 1: "Habe A" → Sende Nachricht für B → [WEITERARBEITEN]
+Actor 2: "Habe B" → Sende Nachricht für A → [WEITERARBEITEN]
+Ergebnis: Nachrichten werden verarbeitet, beide fertig
+```
+
 ## Kompilieren und Ausführen
 
 ```bash
 ponyc && ./pony
 ```
 
-## Ausgabe (Erfolgreich!)
+## Ausgabe
 
 ```
 Thread 1: Starting...
@@ -43,22 +72,7 @@ Thread 2: Completed successfully!
 
 **Das Programm terminiert!** Im Gegensatz zu allen anderen Sprachen.
 
-## Warum kein Deadlock?
-
-### 1. Asynchrone Nachrichten
-```pony
-thread2.request_resource2(this)  // Kehrt sofort zurück!
-```
-
-Der Actor schickt eine Nachricht und arbeitet weiter. Er wartet **nicht** auf Antwort.
-
-### 2. Keine Locks
-Pony hat keine Mutexes, Semaphoren oder andere Blocking-Primitives.
-
-### 3. Sequenzielle Nachrichtenverarbeitung
-Jeder Actor verarbeitet Nachrichten in einer Queue - eine nach der anderen.
-
-## Vergleich der Ausgaben
+## Vergleich mit anderen Sprachen
 
 | Sprache | Ergebnis |
 |---------|----------|
@@ -67,20 +81,6 @@ Jeder Actor verarbeitet Nachrichten in einer Queue - eine nach der anderen.
 | Rust | Hängt ewig |
 | Swift | Hängt ewig |
 | **Pony** | **Terminiert erfolgreich** |
-
-## Das Prinzip
-
-```
-Andere Sprachen:
-Thread 1: Lock A → Warte auf B → [BLOCKED]
-Thread 2: Lock B → Warte auf A → [BLOCKED]
-Ergebnis: DEADLOCK
-
-Pony:
-Actor 1: "Habe A" → Sende Nachricht für B → [WEITERARBEITEN]
-Actor 2: "Habe B" → Sende Nachricht für A → [WEITERARBEITEN]
-Ergebnis: Nachrichten werden verarbeitet, beide fertig
-```
 
 ## Fazit
 

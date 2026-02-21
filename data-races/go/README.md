@@ -1,4 +1,4 @@
-# Go 1.25.5: Data Race Demonstration
+# Data Races - Go 1.25.5
 
 ## Das Problem
 

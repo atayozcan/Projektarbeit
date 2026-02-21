@@ -1,4 +1,4 @@
-# C++26: Data Race Demonstration
+# Data Races - C++26
 
 ## Das Problem
 
@@ -32,7 +32,7 @@ Wenn beide Threads gleichzeitig lesen, geht ein Inkrement verloren.
 g++ -std=c++26 main.cpp -o main -pthread && ./main
 ```
 
-## Typische Ergebnisse
+## Ausgabe
 
 | Durchlauf | Erwartet | Tatsächlich |
 |-----------|----------|-------------|

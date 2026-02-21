@@ -87,7 +87,7 @@ cd rust && cargo run
 cd swift && swift main.swift
 
 # Pony
-cd pony && ponyc && ./data-races
+cd pony && ponyc && ./pony
 ```
 
 ## Kernaussage

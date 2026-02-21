@@ -1,4 +1,4 @@
-# Rust Edition 2024: Out-of-Bounds Fehlerbehandlung
+# Runtime Errors - Rust 2024
 
 ## Verfügbare Methoden
 
