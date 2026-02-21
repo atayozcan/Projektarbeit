@@ -20,6 +20,12 @@ func goroutine2() {
 
 Beide Goroutines warten ewig aufeinander → **Deadlock**
 
+## Kompilieren und Ausführen
+
+```bash
+go run main.go
+```
+
 ## Typische Ausgabe
 
 ```

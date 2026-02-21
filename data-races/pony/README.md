@@ -57,6 +57,12 @@ actor Main
     // Ergebnis: IMMER 200000
 ```
 
+## Kompilieren und Ausführen
+
+```bash
+ponyc && ./pony
+```
+
 ## Vergleich mit anderen Sprachen
 
 | Sprache | Verhindert Data Races? | Wie? |

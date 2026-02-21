@@ -48,7 +48,7 @@ class Leaker {
 }
 ```
 
-## Ausführen
+## Kompilieren und Ausführen
 
 ```bash
 swift main.swift

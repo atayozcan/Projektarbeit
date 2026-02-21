@@ -74,6 +74,12 @@ let value = arr.tryAccess(10) ?? defaultValue
 - Kein throw, nur `nil`
 - Kompakt für einfache Fälle
 
+## Kompilieren und Ausführen
+
+```bash
+swift main.swift
+```
+
 ## Vergleich mit Pony
 
 | Aspekt | Swift 6.2 | Pony |

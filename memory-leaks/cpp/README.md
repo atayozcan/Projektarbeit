@@ -12,6 +12,12 @@ void leak_memory() {
 
 Der allozierte Speicher wird nie freigegeben.
 
+## Kompilieren und Ausführen
+
+```bash
+g++ -std=c++26 main.cpp -o main && ./main
+```
+
 ## Typische Ausgabe
 
 ```

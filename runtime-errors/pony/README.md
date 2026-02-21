@@ -73,6 +73,12 @@ try
 end  // Kompilierfehler!
 ```
 
+## Kompilieren und Ausführen
+
+```bash
+ponyc && ./pony
+```
+
 ## Vergleich mit anderen Sprachen
 
 | Aspekt | C++26 | Go 1.25.5 | Rust 2024 | **Pony** |

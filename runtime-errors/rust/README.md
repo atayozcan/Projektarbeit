@@ -89,6 +89,12 @@ if let Some(value) = vec.iter().nth(10) {
 - Iteratoren sind immer sicher
 - Können nicht out-of-bounds gehen
 
+## Kompilieren und Ausführen
+
+```bash
+cargo run
+```
+
 ## Vergleich mit Pony
 
 | Aspekt | Rust 2024 | Pony |

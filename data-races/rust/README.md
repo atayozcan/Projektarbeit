@@ -51,6 +51,12 @@ thread::spawn(move || {
 let value = rx.recv().unwrap();
 ```
 
+## Kompilieren und Ausführen
+
+```bash
+cargo run
+```
+
 ## Vergleich mit Pony
 
 | Aspekt | Rust 2024 | Pony |

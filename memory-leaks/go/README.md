@@ -23,6 +23,12 @@ func leaky() {
 }
 ```
 
+## Kompilieren und Ausführen
+
+```bash
+go run main.go
+```
+
 ## Typische Ausgabe
 
 ```

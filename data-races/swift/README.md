@@ -58,6 +58,12 @@ var shared = 0
 Task { shared += 1 }  // Error: Mutation of captured var 'shared'
 ```
 
+## Kompilieren und Ausführen
+
+```bash
+swift main.swift
+```
+
 ## Test-Ergebnisse
 
 ### Unsicher (`nonisolated(unsafe)`)

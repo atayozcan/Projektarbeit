@@ -31,6 +31,12 @@ Swift's Actor-Isolation verhindert **Data Races**, aber **nicht Deadlocks**!
 - Actor-Zugriff ist serialisiert ✓
 - Deadlocks durch `await` weiterhin möglich ✗
 
+## Kompilieren und Ausführen
+
+```bash
+swift main.swift
+```
+
 ## Typische Ausgabe
 
 ```

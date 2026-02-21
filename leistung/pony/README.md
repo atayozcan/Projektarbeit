@@ -9,14 +9,10 @@ Sieve of Eratosthenes - Summe aller Primzahlen bis 10.000.000
 - **Zeit:** ~46 ms
 - **Sum:** 3203324994356
 
-## Kompilierung
+## Kompilieren und Ausführen
 
 ```bash
-# Kompilieren
-ponyc
-
-# Assembly generieren
-objdump -d -S pony > main.s
+ponyc && ./pony
 ```
 
 ## Assembly-Analyse

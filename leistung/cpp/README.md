@@ -9,14 +9,10 @@ Sieve of Eratosthenes - Summe aller Primzahlen bis 10.000.000
 - **Zeit:** ~32 ms
 - **Sum:** 3203324994356
 
-## Kompilierung
+## Kompilieren und Ausführen
 
 ```bash
-# Mit Optimierung
-g++ -std=c++26 -O3 main.cpp -o main
-
-# Assembly generieren
-g++ -std=c++26 -O3 -S main.cpp -o main.s
+g++ -std=c++26 -O3 main.cpp -o main && ./main
 ```
 
 ## Assembly-Analyse

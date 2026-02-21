@@ -26,6 +26,12 @@ Rust verhindert **Data Races**, aber **nicht Deadlocks**!
 - Data Races: Compile-Time Fehler ✓
 - Deadlocks: Weiterhin möglich ✗
 
+## Kompilieren und Ausführen
+
+```bash
+cargo run
+```
+
 ## Typische Ausgabe
 
 ```

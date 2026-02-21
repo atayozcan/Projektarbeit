@@ -18,6 +18,12 @@ actor Thread2
     thread1.request_resource1(this)  // Nicht-blockierend!
 ```
 
+## Kompilieren und Ausführen
+
+```bash
+ponyc && ./pony
+```
+
 ## Ausgabe (Erfolgreich!)
 
 ```

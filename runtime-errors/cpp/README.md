@@ -68,6 +68,28 @@ if (result) {
 - Fehlerinformation erhalten
 - Trotzdem optional
 
+## Kompilieren und Ausführen
+
+```bash
+g++ -std=c++26 main.cpp -o main && ./main
+```
+
+## Typische Ausgabe
+
+```
+=== Out-of-Bounds Test: C++26 ===
+
+Array: [10, 20, 30]
+Size:  3
+
+--- Test 1: Invalid Index (10) ---
+terminate called after throwing an instance of 'std::out_of_range'
+  what():  vector::_M_range_check: __n (which is 10) >= this->size() (which is 3)
+Aborted (core dumped)
+```
+
+Das Programm stürzt bei `vec.at(10)` ab, da keine Exception-Behandlung vorhanden ist. Die weiteren Tests (safe_access, try_access) werden nicht erreicht.
+
 ## Vergleich mit Pony
 
 | Aspekt | C++26 | Pony |

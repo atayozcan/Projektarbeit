@@ -9,14 +9,10 @@ Sieve of Eratosthenes - Summe aller Primzahlen bis 10.000.000
 - **Zeit:** ~44 ms
 - **Sum:** 3203324994356
 
-## Kompilierung
+## Kompilieren und Ausführen
 
 ```bash
-# Mit Optimierung
-swiftc -O main.swift -o main
-
-# Assembly generieren
-swiftc -O -emit-assembly main.swift -o main.s
+swiftc -O main.swift -o main && ./main
 ```
 
 ## Assembly-Analyse

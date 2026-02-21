@@ -18,7 +18,7 @@ func philosopher(id int, left, right chan bool) {
 }
 ```
 
-## Ausführen
+## Kompilieren und Ausführen
 
 ```bash
 go run main.go

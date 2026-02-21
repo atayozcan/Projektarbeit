@@ -20,6 +20,12 @@ void thread2() {
 
 Beide Threads warten ewig aufeinander → **Deadlock**
 
+## Kompilieren und Ausführen
+
+```bash
+g++ -std=c++26 main.cpp -o main -pthread && ./main
+```
+
 ## Typische Ausgabe
 
 ```

@@ -28,8 +28,7 @@ actor Fork
 ## Kompilieren und Ausführen
 
 ```bash
-ponyc
-./dining-philosophers
+ponyc && ./pony
 ```
 
 ## Ausgabe

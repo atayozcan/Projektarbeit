@@ -77,6 +77,12 @@ if err != nil {
 value, _ := safeAccess(slice, 10)  // Kompiliert!
 ```
 
+## Kompilieren und Ausführen
+
+```bash
+go run main.go
+```
+
 ## Vergleich mit Pony
 
 | Aspekt | Go 1.25.5 | Pony |

@@ -26,6 +26,12 @@ Zwei Threads inkrementieren denselben Zähler ohne Synchronisation.
 
 Wenn beide Threads gleichzeitig lesen, geht ein Inkrement verloren.
 
+## Kompilieren und Ausführen
+
+```bash
+g++ -std=c++26 main.cpp -o main -pthread && ./main
+```
+
 ## Typische Ergebnisse
 
 | Durchlauf | Erwartet | Tatsächlich |

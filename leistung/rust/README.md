@@ -9,14 +9,10 @@ Sieve of Eratosthenes - Summe aller Primzahlen bis 10.000.000
 - **Zeit:** ~30 ms
 - **Sum:** 3203324994356
 
-## Kompilierung
+## Kompilieren und Ausführen
 
 ```bash
-# Release-Build
-cargo build --release
-
-# Assembly generieren
-cargo rustc --release -- --emit=asm
+cargo run --release
 ```
 
 ## Assembly-Analyse
