@@ -3,7 +3,6 @@
 ## Swift 6.2 Features verwendet
 
 - **Strict Concurrency** - Compiler warnt bei potenziellen Data Races
-- **`nonisolated(unsafe)`** - Explizites Opt-out aus Sicherheitsprüfungen
 - **Actors** - Thread-sichere Zustandsisolation
 - **Structured Concurrency** - `withTaskGroup` für parallele Tasks
 
@@ -17,18 +16,7 @@ Task { counter += 1 }  // Warning: Data race
 Task { counter += 1 }  // Warning: Data race
 ```
 
-## Swift 6.2 Concurrency Model
-
-### `nonisolated(unsafe)` - Explizites Opt-out
-
-```swift
-// "Ich weiß was ich tue" - unterdrückt Warnungen
-nonisolated(unsafe) var unsafeCounter = 0
-```
-
-Verwende dies **nur** für Demonstrationszwecke oder wenn du die Synchronisation selbst garantierst.
-
-### Actors - Die sichere Alternative
+## Die Lösung: Actors
 
 ```swift
 actor SafeCounter {
@@ -48,37 +36,7 @@ let counter = SafeCounter()
 await counter.increment()  // Sicher!
 ```
 
-## Strict Concurrency Checking
-
-Swift 6.2 aktiviert standardmäßig strenge Concurrency-Checks:
-
-```swift
-// Diese Zeile erzeugt einen Compile-Time-Fehler/Warnung:
-var shared = 0
-Task { shared += 1 }  // Error: Mutation of captured var 'shared'
-```
-
-## Swift 6.2 vs. Frühere Versionen
-
-| Feature | Swift 5 | Swift 6.0 | Swift 6.2 |
-|---------|---------|-----------|-----------|
-| Actor | Ja | Ja | Ja |
-| Strict Concurrency | Opt-in | Default | Verbessert |
-| `nonisolated(unsafe)` | Nein | Nein | Ja |
-| MainActor by default | Nein | Nein | Optional |
-
-## Der Unterschied: Warnings vs. Errors
-
-### Swift 6.2
-```swift
-nonisolated(unsafe) var x = 0  // Kompiliert (mit Warnung)
-```
-
-### Pony
-```pony
-var x: U32 = 0  // Innerhalb Actor OK
-// Sharing zwischen Actors: COMPILE ERROR
-```
+Actors serialisieren den Zugriff auf ihren Zustand. Nur ein Task kann gleichzeitig auf den Actor zugreifen.
 
 ## Kompilieren und Ausführen
 
@@ -88,14 +46,20 @@ swift main.swift
 
 ## Ausgabe
 
-### Unsicher (`nonisolated(unsafe)`)
 ```
-Counter: 156789  (erwartet: 200000)
-Status: RACE DETECTED (lost 43211 increments)
-```
+=== Data Race Test: Swift 6.2 (Actor) ===
 
-### Sicher (Actor)
-```
+Setup: Two tasks incrementing an actor-protected counter
+Each task: 100000 increments
+Expected result: 200000
+
+--- Running Test ---
+Task 1: Starting...
+Task 2: Starting...
+Task 1: Finished
+Task 2: Finished
+
+--- Result ---
 Counter: 200000
 Status: NO RACE (Actor guarantees safety)
 ```
@@ -106,9 +70,8 @@ Status: NO RACE (Actor guarantees safety)
 |--------|-----------|------|
 | Actor Model | Ja | Ja |
 | Strict Checking | Default (Warnings) | Immer (Errors) |
-| Unsafe Escape | `nonisolated(unsafe)` | Nicht möglich |
 | Blocking | `await` (synchron) | Nie (asynchron) |
-| Data Races | Möglich (mit unsafe) | Unmöglich |
+| Data Races | Verhindert durch Actors | Unmöglich |
 
 ## Fazit
 
@@ -116,6 +79,3 @@ Swift 6.2 macht große Fortschritte bei Concurrency Safety:
 - Strict Concurrency ist jetzt Standard
 - Actors sind die empfohlene Lösung
 - Compiler-Warnungen helfen beim Finden von Races
-
-**Aber**: `nonisolated(unsafe)` erlaubt weiterhin unsicheren Code.
-Pony hat keine solche Escape-Hatch.

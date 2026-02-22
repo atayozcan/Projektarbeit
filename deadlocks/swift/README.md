@@ -3,21 +3,14 @@
 ## Das Problem
 
 ```swift
-actor Resource1 {
-    func acquire(by thread: String) async {
-        // Hält Ressource
-    }
-}
-
+// Gegenläufige Reihenfolge → Deadlock
 func task1() async {
     await resource1.acquire(by: "Task 1")  // Holt resource1
-    await Task.sleep(100_000_000)
     await resource2.acquire(by: "Task 1")  // Wartet auf resource2
 }
 
 func task2() async {
     await resource2.acquire(by: "Task 2")  // Holt resource2
-    await Task.sleep(100_000_000)
     await resource1.acquire(by: "Task 2")  // Wartet auf resource1
 }
 ```
@@ -31,40 +24,13 @@ Swift's Actor-Isolation verhindert **Data Races**, aber **nicht Deadlocks**!
 - Actor-Zugriff ist serialisiert ✓
 - Deadlocks durch `await` weiterhin möglich ✗
 
-## Warum Deadlock trotz Actors?
-
-Swift Actors verwenden `await` für synchrone Aufrufe:
+## Die Lösung: Konsistente Ressourcen-Reihenfolge
 
 ```swift
-await resource.acquire()  // Blockiert bis fertig
-```
-
-Im Gegensatz zu Pony, wo Nachrichten asynchron sind:
-
-```pony
-resource.acquire()  // Fire-and-forget, blockiert nicht
-```
-
-## Lösungen in Swift
-
-### 1. Timeouts
-```swift
-try await Task.sleep(nanoseconds: 100_000_000)
-// Abbruch nach Timeout
-```
-
-### 2. Nicht-blockierende Patterns
-```swift
-actor Resource {
-    func tryAcquire() -> Bool {
-        // Sofortige Rückgabe ohne Warten
-    }
-}
-```
-
-### 3. Hierarchische Ressourcen
-```swift
-// Immer resource1 vor resource2 anfordern
+// Beide Tasks fordern Ressourcen in gleicher Reihenfolge an
+// Task 1: resource1 -> resource2
+// Task 2: resource1 -> resource2
+// → Kein zirkuläres Warten möglich
 ```
 
 ## Der entscheidende Unterschied
@@ -81,24 +47,37 @@ swift main.swift
 ## Ausgabe
 
 ```
-Thread 1: Starting...
-Thread 1: Locked resource1
-Thread 2: Starting...
-Thread 2: Locked resource2
-Thread 1: Trying to lock resource2...
-Thread 2: Trying to lock resource1...
-[Programm hängt - Ctrl+C zum Beenden]
+=== Deadlock Test: Swift 6.2 (consistent resource ordering) ===
+
+Setup: Two tasks acquiring two resources in same order
+Task 1: resource1 -> resource2
+Task 2: resource1 -> resource2
+
+--- Running Test ---
+Task 1: Starting...
+Task 1: Locked resource1
+Task 1: Trying to lock resource2...
+Task 1: Locked resource2
+Task 1: Completed!
+Task 2: Starting...
+Task 2: Locked resource1
+Task 2: Trying to lock resource2...
+Task 2: Locked resource2
+Task 2: Completed!
+
+--- Result ---
+Status: NO DEADLOCK (consistent ordering prevents circular wait)
 ```
 
 ## Vergleich mit Pony
 
-| Aspekt | Swift 6 | Pony |
-|--------|---------|------|
+| Aspekt | Swift 6.2 | Pony |
+|--------|-----------|------|
 | Actor Model | Ja | Ja |
 | Message Passing | Synchron (`await`) | Asynchron |
-| Deadlock möglich | Ja | Nein |
+| Deadlock möglich | Ja (ohne Disziplin) | Nein |
 | Blocking | Ja (`await`) | Nein |
 
 ## Fazit
 
-Swift's Actors schützen vor Data Races, aber das synchrone `await`-Pattern ermöglicht weiterhin Deadlocks. Pony's vollständig asynchrones Actor-Model verhindert Deadlocks strukturell.
+Swift's Actors schützen vor Data Races, aber das synchrone `await`-Pattern ermöglicht weiterhin Deadlocks. Konsistente Ressourcen-Reihenfolge (hierarchische Locks) verhindert zirkuläres Warten. Pony's vollständig asynchrones Actor-Model verhindert Deadlocks strukturell.

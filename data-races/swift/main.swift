@@ -1,21 +1,25 @@
-// Data Race Demonstration in Swift 6.2
+// Data Race Prevention with Actors in Swift 6.2
 import Foundation
 
 let ITERATIONS = 100000
 
-// UNSICHER: Shared mutable state ohne Schutz
-nonisolated(unsafe) var counter = 0
+// Actor isoliert den Zustand - nur ein Task kann gleichzeitig zugreifen
+actor SafeCounter {
+    private var value = 0
 
-func increment() {
-    for _ in 0..<ITERATIONS {
-        counter += 1  // DATA RACE!
+    func increment() {
+        value += 1
+    }
+
+    func getValue() -> Int {
+        return value
     }
 }
 
 func runTest() async {
-    print("=== Data Race Test: Swift 6.2 ===")
+    print("=== Data Race Test: Swift 6.2 (Actor) ===")
     print()
-    print("Setup: Two tasks incrementing a shared counter")
+    print("Setup: Two tasks incrementing an actor-protected counter")
     print("Each task: \(ITERATIONS) increments")
     print("Expected result: \(ITERATIONS * 2)")
     print()
@@ -24,28 +28,34 @@ func runTest() async {
     print("Task 1: Starting...")
     print("Task 2: Starting...")
 
-    counter = 0
+    let counter = SafeCounter()
 
     await withTaskGroup(of: Void.self) { group in
         group.addTask {
-            increment()
+            for _ in 0..<ITERATIONS {
+                await counter.increment()
+            }
         }
         group.addTask {
-            increment()
+            for _ in 0..<ITERATIONS {
+                await counter.increment()
+            }
         }
     }
+
+    let result = await counter.getValue()
 
     print("Task 1: Finished")
     print("Task 2: Finished")
     print()
 
     print("--- Result ---")
-    print("Counter: \(counter)")
+    print("Counter: \(result)")
 
-    if counter == ITERATIONS * 2 {
-        print("Status: NO RACE DETECTED (got lucky!)")
+    if result == ITERATIONS * 2 {
+        print("Status: NO RACE (Actor guarantees safety)")
     } else {
-        print("Status: RACE DETECTED (lost \(ITERATIONS * 2 - counter) increments)")
+        print("Status: RACE DETECTED (lost \(ITERATIONS * 2 - result) increments)")
     }
 }
 

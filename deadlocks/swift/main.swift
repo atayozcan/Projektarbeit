@@ -1,79 +1,70 @@
-// Deadlock Demonstration in Swift 6.2
+// Deadlock Prevention with Actors in Swift 6.2
 import Foundation
 
-actor Resource1 {
-    private var holder: String? = nil
+// Actor für Thread-sichere Ressourcenverwaltung
+actor Resource {
+    let name: String
+    private var locked = false
+
+    init(name: String) {
+        self.name = name
+    }
 
     func acquire(by task: String) async {
-        holder = task
-        print("\(task): Locked resource1")
+        while locked {
+            try? await Task.sleep(nanoseconds: 10_000_000)
+        }
+        locked = true
+        print("\(task): Locked \(name)")
     }
 
     func release() {
-        holder = nil
+        locked = false
     }
 }
 
-actor Resource2 {
-    private var holder: String? = nil
+func runTest() async {
+    print("=== Deadlock Test: Swift 6.2 (consistent resource ordering) ===")
+    print()
+    print("Setup: Two tasks acquiring two resources in same order")
+    print("Task 1: resource1 -> resource2")
+    print("Task 2: resource1 -> resource2")
+    print()
+    print("--- Running Test ---")
 
-    func acquire(by task: String) async {
-        holder = task
-        print("\(task): Locked resource2")
+    let r1 = Resource(name: "resource1")
+    let r2 = Resource(name: "resource2")
+
+    await withTaskGroup(of: Void.self) { group in
+        group.addTask {
+            print("Task 1: Starting...")
+            await r1.acquire(by: "Task 1")
+            try? await Task.sleep(nanoseconds: 100_000_000)
+            print("Task 1: Trying to lock resource2...")
+            await r2.acquire(by: "Task 1")
+            print("Task 1: Completed!")
+            await r2.release()
+            await r1.release()
+        }
+        group.addTask {
+            print("Task 2: Starting...")
+            await r1.acquire(by: "Task 2")
+            try? await Task.sleep(nanoseconds: 100_000_000)
+            print("Task 2: Trying to lock resource2...")
+            await r2.acquire(by: "Task 2")
+            print("Task 2: Completed!")
+            await r2.release()
+            await r1.release()
+        }
     }
 
-    func release() {
-        holder = nil
-    }
-}
-
-let resource1 = Resource1()
-let resource2 = Resource2()
-
-func task1Function() async {
-    print("Task 1: Starting...")
-    await resource1.acquire(by: "Task 1")
-
-    try? await Task.sleep(nanoseconds: 100_000_000)
-
-    print("Task 1: Trying to lock resource2...")
-    await resource2.acquire(by: "Task 1")
-    print("Task 1: Completed successfully!")
-}
-
-func task2Function() async {
-    print("Task 2: Starting...")
-    await resource2.acquire(by: "Task 2")
-
-    try? await Task.sleep(nanoseconds: 100_000_000)
-
-    print("Task 2: Trying to lock resource1...")
-    await resource1.acquire(by: "Task 2")
-    print("Task 2: Completed successfully!")
-}
-
-print("=== Deadlock Test: Swift 6.2 ===")
-print()
-print("Setup: Two tasks acquiring two resources in opposite order")
-print("Task 1: resource1 -> resource2")
-print("Task 2: resource2 -> resource1")
-print()
-print("--- Running Test ---")
-
-Task {
-    await task1Function()
-}
-
-Task {
-    await task2Function()
-}
-
-// Note: Program hangs here due to deadlock
-// The result section below will never be reached
-DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
     print()
     print("--- Result ---")
-    print("Status: DEADLOCK (program hangs, Ctrl+C to exit)")
+    print("Status: NO DEADLOCK (consistent ordering prevents circular wait)")
 }
 
+Task {
+    await runTest()
+    exit(0)
+}
 RunLoop.main.run()

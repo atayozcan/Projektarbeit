@@ -1,52 +1,15 @@
 # Memory Leaks - Swift 6.2
 
-## Implementierung
-
-Swift verwendet ARC (Automatic Reference Counting), aber Reference Cycles können Leaks verursachen.
-
-## Reference Cycle Problem
+## Die Lösung: ARC
 
 ```swift
-class Person {
-    var apartment: Apartment?
-}
-
-class Apartment {
-    var tenant: Person?  // Strong reference → Cycle!
-}
-
-let john = Person()
-let apt = Apartment()
-john.apartment = apt
-apt.tenant = john  // LEAK: Beide werden nie freigegeben
+do {
+    let alice = Person(name: "Alice")
+    let bob = Person(name: "Bob")
+}  // ARC gibt beide automatisch frei (deinit wird aufgerufen)
 ```
 
-## Lösung: Weak References
-
-```swift
-class SafeApartment {
-    weak var tenant: SafePerson?  // Weak bricht den Zyklus
-}
-```
-
-## Closure Capture Cycles
-
-```swift
-class Leaker {
-    var closure: (() -> Void)?
-
-    func setupLeak() {
-        closure = { print(self.name) }  // LEAK: self captured!
-    }
-
-    func setupSafe() {
-        closure = { [weak self] in      // OK: weak capture
-            guard let self = self else { return }
-            print(self.name)
-        }
-    }
-}
-```
+Swifts ARC (Automatic Reference Counting) zählt Referenzen und gibt Objekte automatisch frei, wenn keine Referenzen mehr existieren.
 
 ## Kompilieren und Ausführen
 
@@ -57,16 +20,19 @@ swift main.swift
 ## Ausgabe
 
 ```
-=== Memory Leak Test: Swift 6.2 ===
+=== Memory Leak Test: Swift 6.2 (ARC) ===
 
---- Test 1: ARC Basics ---
-Status: NO LEAK (ARC)
+Setup: Allocate objects, let ARC handle cleanup
 
---- Test 2: Reference Cycle ---
-Status: LEAK (Reference Cycle)
+--- Running Test ---
+  Alice created
+  Bob created
+  Reference count: 1 each
+  Bob freed
+  Alice freed
 
---- Test 3: Weak Reference ---
-Status: NO LEAK (weak reference)
+--- Result ---
+Status: NO LEAK (ARC guarantees cleanup)
 ```
 
 ## Vergleich mit Pony
@@ -74,5 +40,9 @@ Status: NO LEAK (weak reference)
 | Aspekt | Swift | Pony |
 |--------|-------|------|
 | Speicherverwaltung | ARC | ORCA GC |
-| Reference Cycles | Möglich | Unmöglich |
-| Lösung | weak/unowned | Nicht nötig |
+| Manuelle Arbeit | Keine | Keine |
+| Compile-Time | Teilweise | Ja |
+
+## Fazit
+
+Swifts ARC verwaltet Speicher automatisch durch Reference Counting. Pony's ORCA GC erreicht dasselbe ohne Counting-Overhead.
